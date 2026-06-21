@@ -1,0 +1,7 @@
+{
+  "python.defaultInterpreterPath": "${env:HOME}/venv/BandLeadDevice/bin/python",
+  "python.terminal.activateEnvironment": true,
+  "python.analysis.extraPaths": [
+    "${workspaceFolder}/DynamixelSDK/python/src"
+  ]
+}

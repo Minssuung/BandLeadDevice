@@ -1,0 +1,14 @@
+Metadata-Version: 2.1
+Name: dynamixel-sdk
+Version: 4.0.4
+Summary: Dynamixel SDK 4. python package
+Home-page: https://github.com/ROBOTIS-GIT/DynamixelSDK
+Author: Leon Jung, Wonho Yun, Hyungyu Kim
+Author-email: Leon Jung <rwjung@robotis.com>, Wonho Yun <ywh@robotis.com>, Hyungyu Kim <kimhg@robotis.com>
+License: Apache 2.0
+Project-URL: Homepage, https://github.com/ROBOTIS-GIT/DynamixelSDK
+Requires-Python: >=3.6
+Description-Content-Type: text/plain
+License-File: LICENSE.txt
+
+Description is available at http://emanual.robotis.com/docs/en/software/dynamixel/dynamixel_sdk/overview/

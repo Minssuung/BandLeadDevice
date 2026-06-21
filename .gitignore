@@ -1,0 +1,18 @@
+# Python
+.venv/
+venv/
+__pycache__/
+*.py[cod]
+
+# 수동 백업 (이제 git이 버전관리 — 정리해도 됨)
+_before_quat_backup/
+
+# 런타임 로그/캐시
+viz/sim_logs/
+*.log
+.DS_Store
+
+# 대용량 데모 영상 — git에 안 올림 (필요하면: git add -f <파일>, 또는 git-lfs)
+*.mp4
+*.mkv
+*.mov

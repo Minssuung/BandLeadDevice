@@ -1,0 +1,3 @@
+PyQt5>=5.15
+pyserial>=3.5
+# DynamixelSDK (dynamixel_sdk, dynamixel_easy_sdk) is loaded from ./DynamixelSDK/python/src via .venv .pth

@@ -1,0 +1,8 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(echo \"--- exit code $? ---\")",
+      "Bash(cd /home/minsung/dev_ws/BandLeadDevice/work_process/esp_imu_pc_control && cp -r ../2_4_python_control_test/icons ./icons && ls -la icons/)"
+    ]
+  }
+}
