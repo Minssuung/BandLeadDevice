@@ -21,7 +21,7 @@ WALL = 3.0
 C = (0, -25, -6)                 # 트리거 피벗
 HALL = (0, -19.6, -14.6)
 LIFT_AT = (8, 18, -34); SS = (20.0, 6.5, 10.2)
-IMU_AT = (0, 24.6, -55); IMU_TILT = PT.IMU_TILT_DEG
+IMU_AT = (-4, 24.6, -55); IMU_TILT = PT.IMU_TILT_DEG   # x: -X벽 쪽으로 붙임
 W34, W30, TH = PT.IMU_BOARD; STAND = 4.0
 
 # ── 형상 ──
@@ -41,36 +41,39 @@ except Exception as e:
     body = ctrl.cut(ih.union(ihandle))
     body = body.faces(">Z").workplane().rect(HEAD[0]-2*WALL, HEAD[1]-2*WALL).cutBlind(-(HEAD[2]-WALL))
 
-# ── 트리거 피벗 보스 2 + 홀 포켓 ──
-for sx in (-8, 8):
-    boss = (cq.Workplane("YZ", origin=(sx, C[1], C[2])).circle(4).extrude(2.5 if sx < 0 else -2.5)
-            .cut(cq.Workplane("YZ", origin=(sx, C[1], C[2])).circle(PT.TRIG_PIVOT_DIA / 2).extrude(3 if sx < 0 else -3)))
-    body = body.union(boss)
+# ── 트리거 피벗 보스 2 (앞벽 부착) + 핀홀 + 홀 포켓 ──
+for sx in (-9, 9):
+    body = body.union(cq.Workplane("XY", origin=(sx, C[1], C[2])).box(4, 7, 9))   # 앞벽까지 닿는 블록
+body = body.cut(cq.Workplane("YZ", origin=(-12, C[1], C[2])).circle(PT.TRIG_PIVOT_DIA / 2).extrude(24))  # 핀홀 Φ3 (X축)
 body = body.cut(cq.Workplane("XZ", origin=(HALL[0], HALL[1] + 2, HALL[2])).rect(4.6, 3.4).extrude(-3.5))  # AH49E 포켓
 
-# ── 리프트 SS-5GL 포켓 + 레버창 ──
-body = body.cut(cq.Workplane("XY", origin=LIFT_AT).box(SS[1] + 0.6, SS[2] + 0.6, SS[0] + 0.6))
-body = body.cut(cq.Workplane("XY", origin=(LIFT_AT[0] + 6, LIFT_AT[1], LIFT_AT[2])).box(16, 4, 6))      # 레버 통로(측면)
+# ── 리프트 SS-5GL: 벽부착 브래킷 → 포켓 + 레버창 + 나사홀 ──
+lbrk = cq.Workplane("XY", origin=(LIFT_AT[0] - 2, LIFT_AT[1], LIFT_AT[2])).box(24, 14, 26).intersect(ctrl)
+body = body.union(lbrk)                                                                       # 벽 부착 솔리드
+body = body.cut(cq.Workplane("XY", origin=LIFT_AT).box(SS[1] + 0.6, SS[2] + 0.6, SS[0] + 0.6))  # 스위치 포켓
+body = body.cut(cq.Workplane("XY", origin=(LIFT_AT[0] + 8, LIFT_AT[1], LIFT_AT[2])).box(18, 4, 6))  # 레버창(측면)
+for dz in (-6, 6):                                                                            # 스위치 고정 나사홀
+    body = body.cut(cq.Workplane("YZ", origin=(LIFT_AT[0] - SS[1] / 2, LIFT_AT[1], LIFT_AT[2] + dz)).circle(0.9).extrude(-5))
 
-# ── IMU 스탠드오프 보스 2 (대각 홀) ──
-def orient(s):
-    return s.rotate((0, 0, 0), (0, 1, 0), -90).rotate((0, 0, 0), (1, 0, 0), IMU_TILT).translate(IMU_AT)
+# ── IMU 백킹 플레이트 (-X벽 부착, 손잡이형상 intersect로 벽에 확실히 붙음) + 나사홀2 ──
+ca, sa = np.cos(np.radians(IMU_TILT)), np.sin(np.radians(IMU_TILT))
+plate = cq.Workplane("XY", origin=(-14, IMU_AT[1], IMU_AT[2])).box(10, 30, 36)   # x -19..-9
+plate = plate.rotate(IMU_AT, (IMU_AT[0] + 1, IMU_AT[1], IMU_AT[2]), IMU_TILT)
+plate = plate.intersect(ctrl)                                                     # 손잡이 형상으로 트림 → 벽 부착
 for u, v in PT.IMU_MOUNT_HOLES:
-    p = (cq.Workplane("XY", origin=(u - W34 / 2, v - W30 / 2, -TH / 2 - STAND)).circle(2.3).extrude(STAND)
-         .faces(">Z").workplane().circle(0.85).cutBlind(STAND + 2))
-    body = body.union(orient(p))
+    ly, lz = v - W30 / 2, u - W34 / 2
+    wy = IMU_AT[1] + ly * ca - lz * sa
+    wz = IMU_AT[2] + ly * sa + lz * ca
+    plate = plate.cut(cq.Workplane("YZ", origin=(IMU_AT[0] - 5, wy, wz)).circle(0.85).extrude(-8))  # M2 파일럿
+body = body.union(plate)
 
 # ── 조립 완성용 디테일 ──
-# 리프트 SS-5GL 고정 보스 2 (M2 파일럿) — 스위치 나사고정
-for dz in (-6, 6):
-    body = body.union(cq.Workplane("XY", origin=(LIFT_AT[0] - 1.5, LIFT_AT[1], LIFT_AT[2] + dz)).box(3, 3, 4)
-                      .faces(">Z").workplane().circle(0.9).cutBlind(-3))
 # 배선 출구 Ø8 (손잡이 바닥 → 외부 MCU 케이블)
 body = body.cut(cq.Workplane("XY", origin=(0, 35, -88)).circle(4.0).extrude(-18))
-# 트리거 토션스프링 레그 받침 리브 (그립측, 스틱 footprint 밖으로)
-body = body.union(cq.Workplane("XY", origin=(0, C[1] + 1, C[2] - 2)).box(7, 2, 4))
-# 트리거 레버 통로 슬롯 (앞면 벽) — 레버가 드나들게
-body = body.cut(cq.Workplane("XY", origin=(0, -27.5, -16)).box(15, 7, 26))
+# 트리거 토션스프링 레그 포스트 (앞벽 부착, 슬롯 밖)
+body = body.union(cq.Workplane("XY", origin=(12, C[1], C[2] - 2)).box(2, 7, 6))
+# 트리거 레버 통로 슬롯 (앞벽, 레버 폭만 — 보스는 슬롯 밖에 남게)
+body = body.cut(cq.Workplane("XY", origin=(0, -27.5, -16)).box(13, 7, 26))
 
 cq.exporters.export(body, f"{OUT}/grip_body_v3.step")
 cq.exporters.export(body, f"{OUT}/grip_body_v3.stl")
