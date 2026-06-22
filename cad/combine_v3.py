@@ -17,7 +17,8 @@ PARTS = [
     ("button_caps.stl",    (0.95, 0.50, 0.25), 1.0, "버튼캡 A/B/menu"),
     ("trigger_lever_v3.stl", (0.20, 0.45, 0.90), 1.0, "트리거 레버(검지)"),
     ("trigger_mount_v3.stl", (0.30, 0.70, 0.40), 1.0, "트리거 보스+홀"),
-    ("imu_cradle_v3.stl",  (0.60, 0.40, 0.85), 0.95, "IMU 크래들"),
+    ("imu_board_v3.stl",   (0.95, 0.55, 0.25), 0.9, "IMU 보드"),
+    ("imu_mount_v3.stl",   (0.20, 0.40, 0.85), 0.95, "IMU 스탠드오프"),
 ]
 loaded = []
 merged = []
