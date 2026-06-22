@@ -23,12 +23,12 @@ SS = (20.0, 6.5, 10.2)            # SS-5GL 본체 L×W×H (근사), 장축=Z 배
 # ── IMU 크래들 (보드 34×30×10, 11mm 슬롯, 30° 기울임) ──
 bL, bW, bH = PT.IMU_BOARD          # 34,30,10
 slot = PT.IMU_SLOT_W               # 11
-# 보드: 폭30(X) × 두께10(Y) × 길이34(Z)
-board = cq.Workplane("XY").box(bW, bH, bL)
-# 크래들: 바닥판 + 양벽(11mm 슬롯)
-base = cq.Workplane("XY", origin=(0, 0, -bL / 2 - 1.5)).box(bW + 6, slot + 6, 3)
-w1 = cq.Workplane("XY", origin=(0, slot / 2 + 1, -bL / 2 + 8)).box(bW + 6, 2, 20)
-w2 = cq.Workplane("XY", origin=(0, -slot / 2 - 1, -bL / 2 + 8)).box(bW + 6, 2, 20)
+# 보드: 두께10(X) × 폭30(Y) × 길이34(Z) — 넓은 면이 측면(±X) 향함(세로 날)
+board = cq.Workplane("XY").box(bH, bW, bL)
+# 크래들: 바닥판 + 양벽(±X, 11mm 슬롯)
+base = cq.Workplane("XY", origin=(0, 0, -bL / 2 - 1.5)).box(slot + 6, bW + 6, 3)
+w1 = cq.Workplane("XY", origin=(slot / 2 + 1, 0, -bL / 2 + 8)).box(2, bW + 6, 20)
+w2 = cq.Workplane("XY", origin=(-slot / 2 - 1, 0, -bL / 2 + 8)).box(2, bW + 6, 20)
 cradle = base.union(w1).union(w2)
 
 
