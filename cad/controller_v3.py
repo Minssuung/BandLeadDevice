@@ -18,7 +18,7 @@ OUT = "/home/minsung/dev_ws/BandLeadDevice/cad/out"
 # ── 전체 치수 (mm) ──
 HEAD = (56, 58, 24)            # 헤드 X×Y×Z (엄지 입력부)
 HEAD_R = 11                     # 헤드 모서리 라운드
-HANDLE_D = 34                   # 손잡이 단면 지름
+HANDLE_D = 38                   # 손잡이 단면 지름 (IMU 30mm폭 + 벽 수납 위해 34→38)
 HANDLE_L = 92                   # 손잡이 길이
 HANDLE_TILT = 18               # 손잡이 뒤로 기울임(°)
 HANDLE_OFF = (0, 10, -10)      # 손잡이 부착 위치(헤드 하부 뒤쪽)

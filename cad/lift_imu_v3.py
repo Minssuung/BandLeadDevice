@@ -15,8 +15,8 @@ from mpl_toolkits.mplot3d.art3d import Poly3DCollection
 import parts as PT
 
 OUT = "/home/minsung/dev_ws/BandLeadDevice/cad/out"
-IMU_AT = (0, 16, -60)
-IMU_TILT = PT.IMU_TILT_DEG        # 30
+IMU_AT = (0, 24.5, -55)           # 손잡이 중심선 위 (몸통 안 수납)
+IMU_TILT = 18.0                    # 손잡이 축과 정렬 = 더 세움 (30° → 18°, 34는 손잡이 길이방향)
 LIFT_AT = (7, 17, -34)            # 손잡이 내부(+X쪽), 레버만 측면 돌출
 SS = (20.0, 6.5, 10.2)            # SS-5GL 본체 L×W×H (근사), 장축=Z 배치
 
