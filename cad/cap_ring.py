@@ -13,7 +13,8 @@ from mpl_toolkits.mplot3d.art3d import Poly3DCollection
 
 OUT = "/home/minsung/dev_ws/BandLeadDevice/cad/out"
 R_MM = float(sys.argv[1]) if len(sys.argv) > 1 else 8.0
-PITCH = 0.8
+PITCH = float(sys.argv[2]) if len(sys.argv) > 2 else 0.6
+SMOOTH = int(sys.argv[3]) if len(sys.argv) > 3 else 25
 
 m = trimesh.load(f"{OUT}/grip_solid.stl")
 vg = m.voxelized(pitch=PITCH).fill()
