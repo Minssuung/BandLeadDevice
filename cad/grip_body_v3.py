@@ -60,6 +60,18 @@ for u, v in PT.IMU_MOUNT_HOLES:
          .faces(">Z").workplane().circle(0.85).cutBlind(STAND + 2))
     body = body.union(orient(p))
 
+# ── 조립 완성용 디테일 ──
+# 리프트 SS-5GL 고정 보스 2 (M2 파일럿) — 스위치 나사고정
+for dz in (-6, 6):
+    body = body.union(cq.Workplane("XY", origin=(LIFT_AT[0] - 1.5, LIFT_AT[1], LIFT_AT[2] + dz)).box(3, 3, 4)
+                      .faces(">Z").workplane().circle(0.9).cutBlind(-3))
+# 배선 출구 Ø8 (손잡이 바닥 → 외부 MCU 케이블)
+body = body.cut(cq.Workplane("XY", origin=(0, 35, -88)).circle(4.0).extrude(-18))
+# 트리거 토션스프링 레그 받침 리브 (그립측, 스틱 footprint 밖으로)
+body = body.union(cq.Workplane("XY", origin=(0, C[1] + 1, C[2] - 2)).box(7, 2, 4))
+# 트리거 레버 통로 슬롯 (앞면 벽) — 레버가 드나들게
+body = body.cut(cq.Workplane("XY", origin=(0, -27.5, -16)).box(15, 7, 26))
+
 cq.exporters.export(body, f"{OUT}/grip_body_v3.step")
 cq.exporters.export(body, f"{OUT}/grip_body_v3.stl")
 print("grip_body vol:", round(body.val().Volume()))
