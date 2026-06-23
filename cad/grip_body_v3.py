@@ -18,9 +18,9 @@ HEAD = (56, 58, 24); HEAD_R = 11
 HANDLE_D = 38; HANDLE_L = 92; HANDLE_TILT = 18; HANDLE_OFF = (0, 10, -10)
 WALL = 3.0
 # 입력 위치 (다른 스크립트와 동일)
-C = (0, -25, -6)                 # 트리거 피벗
-HALL = (0, -19.6, -14.6)
-LIFT_AT = (8, 18, -34); SS = (20.0, 6.5, 10.2)
+C = (0, -25, -9)                 # 트리거 피벗 (캐리어 안 닿게 -9)
+HALL = (0, -17, -18)             # AH49E (자석 뒤, 보스 연결바에)
+LIFT_AT = (12.75, 17.8, -34); SS = (20.0, 6.5, 10.2)   # +X 내벽에 붙게 x=12.75
 IMU_AT = (-4, 24.6, -55); IMU_TILT = PT.IMU_TILT_DEG   # x: -X벽 쪽으로 붙임
 W34, W30, TH = PT.IMU_BOARD; STAND = 4.0
 
@@ -41,11 +41,14 @@ except Exception as e:
     body = ctrl.cut(ih.union(ihandle))
     body = body.faces(">Z").workplane().rect(HEAD[0]-2*WALL, HEAD[1]-2*WALL).cutBlind(-(HEAD[2]-WALL))
 
-# ── 트리거 피벗 보스 2 (앞벽 부착) + 핀홀 + 홀 포켓 ──
+# ── 트리거 피벗 보스 2 (앞벽 부착, 길게 z-20..-4) + 핀홀 + 홀 마운트 바 ──
 for sx in (-9, 9):
-    body = body.union(cq.Workplane("XY", origin=(sx, C[1], C[2])).box(4, 7, 9))   # 앞벽까지 닿는 블록
+    body = body.union(cq.Workplane("XY", origin=(sx, C[1], -12)).box(4, 7, 16))   # z-20..-4, 앞벽 부착
 body = body.cut(cq.Workplane("YZ", origin=(-12, C[1], C[2])).circle(PT.TRIG_PIVOT_DIA / 2).extrude(24))  # 핀홀 Φ3 (X축)
-body = body.cut(cq.Workplane("XZ", origin=(HALL[0], HALL[1] + 2, HALL[2])).rect(4.6, 3.4).extrude(-3.5))  # AH49E 포켓
+# 홀 마운트 바: 두 보스를 잇고(연결) AH49E 포켓이 자석(-Y) 향함
+hbar = cq.Workplane("XY", origin=(0, HALL[1] - 1.5, HALL[2])).box(22, 6, 6)       # x±11 (±9 보스 연결)
+hbar = hbar.cut(cq.Workplane("XZ", origin=(HALL[0], HALL[1] - 4.5, HALL[2])).rect(4.6, 3.4).extrude(-3))  # AH49E 포켓(-Y면)
+body = body.union(hbar)
 
 # ── 리프트 SS-5GL: 벽부착 브래킷 → 포켓 + 레버창 + 나사홀 ──
 lbrk = cq.Workplane("XY", origin=(LIFT_AT[0] - 2, LIFT_AT[1], LIFT_AT[2])).box(24, 14, 26).intersect(ctrl)
@@ -68,12 +71,13 @@ for u, v in PT.IMU_MOUNT_HOLES:
 body = body.union(plate)
 
 # ── 조립 완성용 디테일 ──
-# 배선 출구 Ø8 (손잡이 바닥 → 외부 MCU 케이블)
-body = body.cut(cq.Workplane("XY", origin=(0, 35, -88)).circle(4.0).extrude(-18))
+# 배선 출구 Ø8 (손잡이 축과 동축으로 바닥 관통)
+body = body.cut(cq.Workplane("XY", origin=(0, 0, -78)).circle(4.0).extrude(-25)
+                .rotate((0, 0, 0), (1, 0, 0), HANDLE_TILT).translate(HANDLE_OFF))
 # 트리거 토션스프링 레그 포스트 (앞벽 부착, 슬롯 밖)
-body = body.union(cq.Workplane("XY", origin=(12, C[1], C[2] - 2)).box(2, 7, 6))
-# 트리거 레버 통로 슬롯 (앞벽, 레버 폭만 — 보스는 슬롯 밖에 남게)
-body = body.cut(cq.Workplane("XY", origin=(0, -27.5, -16)).box(13, 7, 26))
+body = body.union(cq.Workplane("XY", origin=(12, C[1], C[2] + 2)).box(2, 7, 6))
+# 트리거 레버 통로 슬롯 (앞벽, +Y로 더 확장해 당김 전구간 클리어)
+body = body.cut(cq.Workplane("XY", origin=(0, -26, -16)).box(13, 10, 26))
 
 cq.exporters.export(body, f"{OUT}/grip_body_v3.step")
 cq.exporters.export(body, f"{OUT}/grip_body_v3.stl")

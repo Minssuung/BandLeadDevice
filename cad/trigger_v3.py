@@ -15,18 +15,18 @@ from mpl_toolkits.mplot3d.art3d import Poly3DCollection
 import parts as PT
 
 OUT = "/home/minsung/dev_ws/BandLeadDevice/cad/out"
-C = np.array([0.0, -25.0, -6.0])    # 피벗 중심, 축 = X
+C = np.array([0.0, -25.0, -9.0])    # 피벗 중심, 축 = X (캐리어 안 닿게 -9로 낮춤)
 PULL = 16.0                          # 당김 각(°)
-MAG = np.array([0.0, -23.3, -13.0])  # 자석 위치(레버 rear, rest)
-HALL = np.array([0.0, -19.6, -14.6]) # AH49E 위치(그립 고정)
+MAG = np.array([0.0, -23.5, -18.0])  # 자석 위치(레버 rear면, 허브 아래)
+HALL = np.array([0.0, -17.0, -18.0]) # AH49E 위치(그립 고정, 자석 뒤)
 
 # ── 레버 (월드좌표, rest) ──
 hub = (cq.Workplane("YZ", origin=(-6, C[1], C[2])).circle(5).extrude(12)
        .cut(cq.Workplane("YZ", origin=(-7, C[1], C[2])).circle((PT.TRIG_PIVOT_DIA + 0.4) / 2).extrude(14)))
 arm = cq.Workplane("XY", origin=(0, -25.5, -16)).box(10, 4, 22)
 lever = hub.union(arm)
-# 자석 포켓 Φ5.2×2.2 (rear +Y면)
-lever = lever.cut(cq.Workplane("XZ", origin=(MAG[0], -23.5, MAG[2])).circle((PT.MAGNET_DIA + 0.2) / 2).extrude(-(PT.MAGNET_THK + 0.2)))
+# 자석 포켓 Φ5.2×2.2 — rear(+Y)면에서 -Y로 파냄(자석이 +Y=홀쪽을 향함)
+lever = lever.cut(cq.Workplane("XZ", origin=(MAG[0], -23.5, MAG[2])).circle((PT.MAGNET_DIA + 0.2) / 2).extrude(PT.MAGNET_THK + 0.2))
 lever = lever.edges("|X and <Z").fillet(1.8)
 cq.exporters.export(lever, f"{OUT}/trigger_lever_v3.stl")
 print("lever vol:", round(lever.val().Volume()))

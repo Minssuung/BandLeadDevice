@@ -22,7 +22,7 @@ FT = 3.0; SK = 11.0
 HKW = 6.0; LIP_OUT = 2.0; SLOT_W = 1.2
 CATCH_Z = -8.0; LIP_BOT = -11.0; WIN_BOT, WIN_TOP = -12.0, -7.5
 sx, sy = HEAD[0] / 2 - (WALL + CLR), HEAD[1] / 2 - (WALL + CLR)   # 스커트 외곽 반치수
-hooks = [(sx, 0, 1, 0), (-sx, 0, -1, 0), (0, sy, 0, 1), (0, -sy, 0, -1)]
+hooks = [(sx, 0, 1, 0), (-sx, 0, -1, 0), (0, sy, 0, 1)]   # -Y 훅 제거(트리거 자리)
 
 
 def repair(m):
@@ -53,6 +53,7 @@ for nm, (bx, by) in BTN.items():
     cap = (cq.Workplane("XY", origin=(bx, by, TRAVEL)).circle(5).extrude(2)                 # 디스크(돌출)
            .union(cq.Workplane("XY", origin=(bx, by, TRAVEL)).circle(2.9).extrude(ACT_TOP - TRAVEL))  # 스템→액추에이터
            .union(cq.Workplane("XY", origin=(bx, by, -FT)).circle(4.4).extrude(-1.0)))      # 리테이너 플랜지
+    cap = cap.cut(cq.Workplane("XY", origin=(bx, by, -2)).box(0.9, 12, 5))                   # 압축 슬릿(플랜지 삽입 가능하게)
     caps = cap if caps is None else caps.union(cap)
 cq.exporters.export(caps, f"{OUT}/button_caps_v3.stl")
 print("button_caps vol:", round(caps.val().Volume()))
@@ -77,6 +78,8 @@ for (hx, hy, dx, dy) in hooks:
         for s in (hx - HKW / 2 - SLOT_W / 2, hx + HKW / 2 + SLOT_W / 2):
             carrier = carrier.cut(cq.Workplane("XY", origin=(s, hy, LIP_BOT - 2)).box(SLOT_W, 9, H, centered=(True, True, False)))
     carrier = carrier.union(make_lip(hx, hy, dx, dy))
+# 트리거 릴리프 — 앞쪽 스커트가 레버 허브와 겹치지 않게 파냄
+carrier = carrier.cut(cq.Workplane("XY", origin=(0, -25, -10)).box(16, 12, 14))
 cq.exporters.export(carrier, f"{OUT}/carrier_v3.step")
 cq.exporters.export(carrier, f"{OUT}/carrier_v3.stl")
 print("carrier vol:", round(carrier.val().Volume()))
