@@ -48,9 +48,9 @@ for (px, py) in JOY_POSTS:
 ACT_TOP = -2.5   # 보드(z-7) 위 택트 액추에이터 top z
 caps = None
 for nm, (bx, by) in BTN.items():
-    carrier = carrier.faces(">Z").workplane().moveTo(bx, by).hole(8.0)
-    cap = (cq.Workplane("XY", origin=(bx, by, 0.8)).circle(5).extrude(2)                  # 디스크(0.8 돌출)
-           .union(cq.Workplane("XY", origin=(bx, by, 0.8)).circle(2.9).extrude(ACT_TOP - 0.8)))  # 스템→택트
+    carrier = carrier.faces(">Z").workplane().moveTo(bx, by).hole(6.2)   # 스템 Ø5.8 가이드(꽉맞음, 안흔들림)
+    cap = (cq.Workplane("XY", origin=(bx, by, 0.8)).circle(5).extrude(2)                  # 디스크 Ø10(턱-못빠짐)+0.8돌출
+           .union(cq.Workplane("XY", origin=(bx, by, 0.8)).circle(2.9).extrude(ACT_TOP - 0.8)))  # 스템 Ø5.8→택트
     caps = cap if caps is None else caps.union(cap)
 cq.exporters.export(caps, f"{OUT}/button_caps_v3.stl")
 print("button_caps vol:", round(caps.val().Volume()))

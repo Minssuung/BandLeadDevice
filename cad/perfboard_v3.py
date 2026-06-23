@@ -26,8 +26,10 @@ def hole(b, x, y, d):    # 월드 절대좌표 cut
 
 for (px, py) in POSTS:                       # 스탠드오프 마운트홀 Ø2.2
     board = hole(board, px, py, 2.2)
-for nm, (bx, by) in BTN.items():             # 택트 핀 통로 5×5
-    board = board.cut(cq.Workplane("XY", origin=(bx, by, BZ + 2)).rect(5, 5).extrude(-(BT + 4)))
+# 택트는 보드 표면에 얹고 핀만 그리드에 납땜 → 컷 없음. 핀 위치만 Ø1로 표시
+for nm, (bx, by) in BTN.items():
+    for dx, dy in [(-2.5, -2.5), (2.5, -2.5), (-2.5, 2.5), (2.5, 2.5)]:   # 6×6 택트 4핀
+        board = hole(board, bx + dx, by + dy, 1.0)
 cq.exporters.export(board, f"{OUT}/perfboard_v3.stl")
 import pymeshfix
 _m = trimesh.load(f"{OUT}/perfboard_v3.stl")
