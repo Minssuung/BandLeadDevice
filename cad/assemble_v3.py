@@ -17,7 +17,7 @@ import parts as PT
 
 OUT = "/home/minsung/dev_ws/BandLeadDevice/cad/out"
 HEAD = (56, 58); HEAD_R = 11; WALL = 3.0; CLR = PT.FDM_CLEAR
-JOY = (0, -9); BTN = {"A": (-14, 14), "B": (0, 14), "menu": (14, 14)}   # 스틱 뒤 한 줄, 모든 훅서 떨어짐(B 메움 방지)
+JOY = (0, -9); BTN = {"torque": (-11, 16), "kbd": (11, 16)}   # 상단 버튼 2개(토크오프·키보드), 조이스틱 뒤
 FT = 3.0; SK = 11.0
 HKW = 6.0; LIP_OUT = 2.0; SLOT_W = 1.2
 CATCH_Z = -8.0; LIP_BOT = -11.0; WIN_BOT, WIN_TOP = -12.0, -7.5
@@ -36,11 +36,15 @@ flange = (cq.Workplane("XY").box(HEAD[0], HEAD[1], FT, centered=(True, True, Fal
 sko = cq.Workplane("XY", origin=(0, 0, -FT)).box(2 * sx, 2 * sy, SK, centered=(True, True, False)).translate((0, 0, -SK)).edges("|Z").fillet(max(1, HEAD_R - WALL))
 ski = cq.Workplane("XY", origin=(0, 0, -FT + 0.5)).box(2 * sx - 4, 2 * sy - 4, SK + 1, centered=(True, True, False)).translate((0, 0, -SK - 1))
 carrier = flange.union(sko.cut(ski))
-# 조이스틱 돔 + 4 보스
-jx, jy = JOY
-# 조이스틱·택트는 PCB(만능보드)에 실장 → 캐리어는 돔홀 + 버튼홀만 (PCB 중심 구조)
-carrier = carrier.faces(">Z").workplane().moveTo(jx, jy).hole(PT.JOY_DOME_DIA)   # 스틱 돔홀(스틱은 보드서 돌출)
-# 버튼: 구멍 Ø8 + 누름캡(디스크+스템). 플랜지/슬릿 불필요 — 아래 보드 위 택트가 캡을 잡아줌
+# 조이스틱 모듈 마운트: 돔홀 + 4 스탠드오프(27×20) — KY-023 모듈을 여기 나사고정(스틱→돔), 5핀은 직배선
+jx, jy = JOY; gx, gy = PT.JOY_MOUNT_GRID
+carrier = carrier.faces(">Z").workplane().moveTo(jx, jy).hole(PT.JOY_DOME_DIA)   # 스틱 돔홀
+JOY_POSTS = [(jx + dx, jy + dy) for dx in (-gx / 2, gx / 2) for dy in (-gy / 2, gy / 2)]
+for (px, py) in JOY_POSTS:
+    post = cq.Workplane("XY", origin=(px, py, -FT)).circle(2.3).extrude(-5)        # z-3..-8 (모듈 PCB 안착)
+    post = post.faces("<Z").workplane().circle(0.85).cutBlind(-4)                   # M2 파일럿(위로)
+    carrier = carrier.union(post)
+# 버튼 2개 구멍 Ø8 + 누름캡(디스크+스템) — 아래 보드 택트가 받쳐줌
 ACT_TOP = -2.5   # 보드(z-7) 위 택트 액추에이터 top z
 caps = None
 for nm, (bx, by) in BTN.items():
@@ -50,8 +54,8 @@ for nm, (bx, by) in BTN.items():
     caps = cap if caps is None else caps.union(cap)
 cq.exporters.export(caps, f"{OUT}/button_caps_v3.stl")
 print("button_caps vol:", round(caps.val().Volume()))
-# PCB(만능보드) 스탠드오프 4 — 캐리어 밑면(z-3)서 z-7로, 조이스틱(±13)·스커트(±24) 사이
-PCB_POSTS = [(-18, -8), (18, -8), (-18, 6), (18, 6)]   # 옆쪽(조이스틱 ±13·버튼 y14 사이) — 버튼홀 안 침범
+# 만능보드(택트2 + 배선 junction) 스탠드오프 4 — 조이스틱 뒤(y>4), 버튼 사이
+PCB_POSTS = [(-16, 8), (16, 8), (-16, 20), (16, 20)]
 for (px, py) in PCB_POSTS:
     post = cq.Workplane("XY", origin=(px, py, -FT)).circle(2.3).extrude(-4)        # z-3..-7
     post = post.faces("<Z").workplane().circle(0.85).cutBlind(-3)                   # M2 파일럿(위로)

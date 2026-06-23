@@ -27,7 +27,7 @@ def repair(m):
 
 
 print("=== 1) 연결성 + watertight ===")
-for f, exp in [("grip_body_v3", 1), ("carrier_v3", 1), ("button_caps_v3", 3), ("trigger_lever_v3", 1)]:
+for f, exp in [("grip_body_v3", 1), ("carrier_v3", 1), ("button_caps_v3", 2), ("trigger_lever_v3", 1)]:
     m = load(f); p = m.split(only_watertight=False)
     wt = m.is_watertight
     print(f"  {f}: {len(p)}조각  watertight={wt}")
@@ -71,20 +71,17 @@ checks = [
     ("앞훅 캐치(그립 솔리드, 창 위)", g, (13, -27.5, -5), True),
     ("앞훅 창(빔)", g, (13, -27.5, -10), False),
     ("리프트 +X벽(스위치 Y끝 솔리드, 창 옆)", g, (15.5, 13.5, -34), True),
-    ("PCB 스탠드오프 솔리드(캐리어)", cc, (19, 6, -5), True),
-    ("PCB 스탠드오프 파일럿(빔)", cc, (18, 6, -5), False),
-    ("버튼menu홀 가장자리(스탠드오프 안 막나)", cc, (16, 14, -1.5), False),
-    ("버튼A홀 가장자리(스탠드오프 안 막나)", cc, (-16, 14, -1.5), False),
-    ("조이스틱 스틱컷Ø12(보드 빔)", pb, (0, -9, -7.75), False),
-    ("택트 핀통로(보드 빔)", pb, (0, 14, -7.75), False),
-    ("보드 솔리드", pb, (8, 8, -7.75), True),
-    ("보드 노치(앞중앙 빔)", pb, (0, -20, -7.75), False),
-    ("택트 y정렬(0,16 빔=y14정렬)", pb, (0, 16, -7.75), False),
-    ("스틱 y정렬(0,-4 빔=y-9정렬)", pb, (0, -4, -7.75), False),
-    ("버튼B 구멍(빔)", cc, (0, 14, -1.5), False),
-    ("버튼B 택트포켓(빔)", cc, (0, 14, -6), False),
-    ("버튼A 구멍(빔, 대조)", cc, (-14, 14, -1.5), False),
-    ("버튼menu 구멍(빔, 대조)", cc, (14, 14, -1.5), False),
+    ("조이스틱 스탠드오프 솔리드(캐리어)", cc, (14.5, 1, -5), True),
+    ("조이스틱 스탠드오프 파일럿(빔)", cc, (13.5, 1, -5), False),
+    ("조이스틱 돔홀(빔)", cc, (0, -9, -1.5), False),
+    ("PCB 스탠드오프 솔리드(캐리어)", cc, (17, 8, -5), True),
+    ("PCB 스탠드오프 파일럿(빔)", cc, (16, 8, -5), False),
+    ("버튼 torque홀(빔)", cc, (-11, 16, -1.5), False),
+    ("버튼 kbd홀(빔)", cc, (11, 16, -1.5), False),
+    ("버튼홀 안막힘(스탠드오프와 분리)", cc, (-13, 16, -1.5), False),
+    ("택트 torque(보드 빔)", pb, (-11, 16, -7.75), False),
+    ("택트 kbd(보드 빔)", pb, (11, 16, -7.75), False),
+    ("보드 솔리드(택트 사이)", pb, (0, 15, -7.75), True),
 ]
 for nm, mesh, pt, want in checks:
     got = bool(mesh.contains([pt])[0])
