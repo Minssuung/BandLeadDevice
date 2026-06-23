@@ -17,7 +17,7 @@ import parts as PT
 
 OUT = "/home/minsung/dev_ws/BandLeadDevice/cad/out"
 HEAD = (56, 58); HEAD_R = 11; WALL = 3.0; CLR = PT.FDM_CLEAR
-JOY = (0, -9); BTN = {"A": (-15, 21), "B": (0, 27), "menu": (15, 21)}   # 스틱(40폭) 뒤로 배치(간섭 회피)
+JOY = (0, -9); BTN = {"A": (-16, 19), "B": (0, 23), "menu": (16, 19)}   # 스틱 뒤·구멍이 플랜지 모서리 안에(림 확보)
 FT = 3.0; SK = 11.0
 HKW = 6.0; LIP_OUT = 2.0; SLOT_W = 1.2
 CATCH_Z = -8.0; LIP_BOT = -11.0; WIN_BOT, WIN_TOP = -12.0, -7.5
