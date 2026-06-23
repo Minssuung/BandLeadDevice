@@ -57,6 +57,7 @@ body = body.cut(cq.Workplane("XY", origin=LIFT_AT).box(SS[1] + 0.6, SS[2] + 0.6,
 body = body.cut(cq.Workplane("XY", origin=(LIFT_AT[0] + 8, LIFT_AT[1], LIFT_AT[2])).box(18, 4, 6))  # 레버창(측면)
 for dz in (-3.2, 3.2):                                                                        # SS-5GL 고정 나사홀 (실측: 피치6.4, Ø2.3)
     body = body.cut(cq.Workplane("YZ", origin=(LIFT_AT[0] - SS[1] / 2, LIFT_AT[1], LIFT_AT[2] + dz)).circle(1.15).extrude(-5))
+body = body.cut(cq.Workplane("XY", origin=(2, LIFT_AT[1], LIFT_AT[2])).box(16, 4, 6))         # 배선 슬롯: 포켓 -X면 → cavity (단자 2선이 위 허브보드로)
 
 # ── IMU 백킹 플레이트 (-X벽 부착, 손잡이형상 intersect로 벽에 확실히 붙음) + 나사홀2 ──
 ca, sa = np.cos(np.radians(IMU_TILT)), np.sin(np.radians(IMU_TILT))
@@ -70,11 +71,12 @@ for u, v in PT.IMU_MOUNT_HOLES:
     plate = plate.cut(cq.Workplane("YZ", origin=(IMU_AT[0] - 5, wy, wz)).circle(0.85).extrude(-8))  # M2 파일럿
 body = body.union(plate)
 
-# ── 허브 만능보드 트레이 ledge (그립 하부 z-16.85 안착; 스커트(-14)·조이스틱모듈(-13) 아래, 홀바 뒤) ──
-# 보드 44×36 @ (0,5) 가 양옆+뒤 3면 ledge에 위에서 드롭인. 앞은 홀바 회피로 코너만 받침
+# ── 허브 만능보드 트레이 (그립 하부; 스커트(-14)·조이스틱모듈(-13) 아래, 홀바 뒤) ──
+# 보드 44×36 @ (0,5). 받침 ledge(z-16.85) + 위립(z-15.1)으로 Z 샌드위치(흔들림 방지). 틸트인 삽입(앞부터 넣고 뒤 내림)
 for (ox, oy, w, d) in [(-23, 4.5, 6, 35), (23, 4.5, 6, 35), (0, 23, 48, 6)]:
-    led = cq.Workplane("XY", origin=(ox, oy, -17.15)).box(w, d, 0.6).intersect(ctrl)
-    body = body.union(led)
+    led = cq.Workplane("XY", origin=(ox, oy, -17.15)).box(w, d, 0.6).intersect(ctrl)   # 받침 top -16.85 (보드 bottom -16.75)
+    lip = cq.Workplane("XY", origin=(ox, oy, -14.85)).box(w, d, 0.5).intersect(ctrl)    # 위립 bottom -15.1 (보드 top -15.25 위, 0.15 클리어)
+    body = body.union(led).union(lip)
 
 # ── 조립 완성용 디테일 ──
 # 배선 출구 Ø8 (실제 손잡이축 통해 바닥중심(0,35,-96.5) 관통 — 원점회전 드리프트 방지)
