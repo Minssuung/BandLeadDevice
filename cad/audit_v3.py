@@ -57,6 +57,23 @@ for a, b, nm, lim in pairs:
     if v > lim:
         issues.append(f"{nm} 간섭 {round(v)}mm³ > {lim}")
 
+# 조이스틱 모듈(러프 30×26×5, PCB+핀 z-8..-13) vs 그립·트리거 전구간
+import trimesh.creation as tc
+mod = tc.box(extents=[30, 26, 5], transform=TF.translation_matrix([0, -6, -10.5]))
+itg = trimesh.boolean.intersection([g, mod], engine="manifold")
+vg = 0 if (itg is None or itg.is_empty) else itg.volume
+print(f"  조이스틱모듈↔그립: {round(vg)} mm³")
+if vg > 30:
+    issues.append(f"조이스틱모듈↔그립 {round(vg)}mm³")
+vmax = 0
+for deg in [0, 8, 16]:
+    lr = lev.copy(); lr.apply_transform(TF.rotation_matrix(np.radians(deg), [1, 0, 0], C))
+    it = trimesh.boolean.intersection([mod, lr], engine="manifold")
+    vmax = max(vmax, 0 if (it is None or it.is_empty) else it.volume)
+print(f"  조이스틱모듈↔트리거(전구간): {round(vmax)} mm³")
+if vmax > 5:
+    issues.append(f"조이스틱모듈↔트리거 {round(vmax)}mm³")
+
 print("=== 4) contains 검사 (포켓·관통이 실제로 셸에 있나) ===")
 checks = [
     ("자석포켓(레버 빔)", lev, (0, -24.5, -18), False),
@@ -71,9 +88,9 @@ checks = [
     ("앞훅 캐치(그립 솔리드, 창 위)", g, (13, -27.5, -5), True),
     ("앞훅 창(빔)", g, (13, -27.5, -10), False),
     ("리프트 +X벽(스위치 Y끝 솔리드, 창 옆)", g, (15.5, 13.5, -34), True),
-    ("조이스틱 스탠드오프 솔리드(캐리어)", cc, (14.5, 1, -5), True),
-    ("조이스틱 스탠드오프 파일럿(빔)", cc, (13.5, 1, -5), False),
-    ("조이스틱 돔홀(빔)", cc, (0, -9, -1.5), False),
+    ("조이스틱 스탠드오프 솔리드(캐리어)", cc, (14.5, 4, -5), True),
+    ("조이스틱 스탠드오프 파일럿(빔)", cc, (13.5, 4, -5), False),
+    ("조이스틱 돔홀(빔)", cc, (0, -6, -1.5), False),
     ("PCB 스탠드오프 솔리드(캐리어)", cc, (17, 8, -5), True),
     ("PCB 스탠드오프 파일럿(빔)", cc, (16, 8, -5), False),
     ("버튼 torque홀(빔)", cc, (-11, 16, -1.5), False),

@@ -17,7 +17,7 @@ import parts as PT
 
 OUT = "/home/minsung/dev_ws/BandLeadDevice/cad/out"
 HEAD = (56, 58); HEAD_R = 11; WALL = 3.0; CLR = PT.FDM_CLEAR
-JOY = (0, -9); BTN = {"torque": (-11, 16), "kbd": (11, 16)}   # 상단 버튼 2개(토크오프·키보드), 조이스틱 뒤
+JOY = (0, -6); BTN = {"torque": (-11, 16), "kbd": (11, 16)}   # 조이스틱 y-6(트리거허브 y-20 회피) / 버튼2 뒤
 FT = 3.0; SK = 11.0
 HKW = 6.0; LIP_OUT = 2.0; SLOT_W = 1.2
 CATCH_Z = -8.0; LIP_BOT = -11.0; WIN_BOT, WIN_TOP = -12.0, -7.5

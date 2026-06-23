@@ -12,7 +12,7 @@ from mpl_toolkits.mplot3d.art3d import Poly3DCollection
 
 OUT = "/home/minsung/dev_ws/BandLeadDevice/cad/out"
 c = trimesh.load(f"{OUT}/carrier_v3.stl")
-JOY = (0, -9); gx, gy = 27, 20
+JOY = (0, -6); gx, gy = 27, 20
 BTN = {"torque": (-11, 16), "kbd": (11, 16)}
 POSTS = [(-16, 8), (16, 8), (-16, 20), (16, 20)]
 JOY_POSTS = [(JOY[0] + dx, JOY[1] + dy) for dx in (-gx / 2, gx / 2) for dy in (-gy / 2, gy / 2)]
