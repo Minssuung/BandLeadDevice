@@ -88,9 +88,23 @@ body = body.union(cq.Workplane("XY", origin=(7.5, -22, C[2] + 2.75)).box(2, 3, 4
 # 트리거 레버 통로 슬롯 (앞벽, +Y로 더 확장해 당김 전구간 클리어)
 body = body.cut(cq.Workplane("XY", origin=(0, -26, -16)).box(13, 10, 26))
 
+# ── 클램쉘: 시임(x=0) 나사보스(축X) — 우=파일럿(M2셀프탭), 좌=클리어. 부품 회피 시임벽 지점 ──
+SEAM_BOSS = [(26, -10), (42, -58), (46, -85)]   # (y,z): 헤드 뒤, 핸들 뒤, 핸들 뒤하부
+for (by, bz) in SEAM_BOSS:
+    body = body.union(cq.Workplane("YZ", origin=(0, by, bz)).circle(3.2).extrude(4, both=True))   # 보스 Ø6.4, x-4..4
+    body = body.cut(cq.Workplane("YZ", origin=(0, by, bz)).circle(0.85).extrude(5, both=True))     # 파일럿 Ø1.7 관통
+    body = body.cut(cq.Workplane("YZ", origin=(0, by, bz)).circle(1.3).extrude(-4.5))              # 좌측 클리어 Ø2.6 (x0..-4.5)
+
 cq.exporters.export(body, f"{OUT}/grip_body_v3.step")
-cq.exporters.export(body, f"{OUT}/grip_body_v3.stl")
+cq.exporters.export(body, f"{OUT}/grip_body_v3.stl")   # 조립체(검증/렌더용)
 print("grip_body vol:", round(body.val().Volume()))
+# ── 좌우 분리 ──
+HB = 250
+right = body.intersect(cq.Workplane("XY", origin=(HB / 2, 0, 0)).box(HB, HB, HB))   # x>0: 리프트 SS-5GL
+left = body.intersect(cq.Workplane("XY", origin=(-HB / 2, 0, 0)).box(HB, HB, HB))    # x<0: IMU
+cq.exporters.export(right, f"{OUT}/grip_right_v3.stl")
+cq.exporters.export(left, f"{OUT}/grip_left_v3.stl")
+print("grip_right vol:", round(right.val().Volume()), "| grip_left vol:", round(left.val().Volume()))
 
 # ── 렌더: iso + 앞 반단면(cavity) ──
 vv, tt = body.val().tessellate(0.4)
