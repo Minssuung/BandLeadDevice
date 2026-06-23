@@ -53,7 +53,7 @@ for nm, (bx, by) in BTN.items():
     holder = holder.cut(cq.Workplane("XY", origin=(bx, by, -9)).box(6.3, 6.3, 6, centered=(True, True, False)))  # 택트 포켓 6.3(스너그, 밑서 삽입)
     # 바닥 리테이너 링: 택트 body 바닥(z-6.5) 받침 → 누를 때 아래로 안 빠짐. body가 위(플랜지)와 이 링 사이에 갇힘
     ring = (cq.Workplane("XY", origin=(bx, by, -6.7)).box(6.3, 6.3, 0.4)
-            .cut(cq.Workplane("XY", origin=(bx, by, -6.7)).box(5.6, 5.6, 0.6)))   # z-6.5..-6.9, 안쪽 5.6(택트6.0 스냅)
+            .cut(cq.Workplane("XY", origin=(bx, by, -6.7)).box(5.2, 5.2, 0.6)))   # z-6.5..-6.9, 안쪽 5.2 (택트6.0이 0.4 스냅, body 바닥 받침)
     carrier = carrier.union(holder).union(ring)
     cap = (cq.Workplane("XY", origin=(bx, by, 0.8)).circle(5).extrude(2)                  # 디스크 Ø10(턱-못빠짐)+0.8돌출
            .union(cq.Workplane("XY", origin=(bx, by, 0.8)).circle(2.9).extrude(ACT_TOP - 0.8)))  # 스템 Ø5.8→택트

@@ -89,12 +89,12 @@ body = body.union(cq.Workplane("XY", origin=(7.5, -22, C[2] + 2.75)).box(2, 3, 4
 body = body.cut(cq.Workplane("XY", origin=(0, -26, -16)).box(13, 10, 26))
 
 # ── 클램쉘: 시임(x=0) 나사보스(축X) — 우=파일럿(M2셀프탭), 좌=클리어. 부품 회피 시임벽 지점 ──
-# (y,z): 시임벽 안쪽 지점(바깥 안튀어나오게). 헤드뒤+정크션뒤+핸들하부 앞·뒤. 앞상부=트리거핀+캐리어 체결. IMU구간 회피
-SEAM_BOSS = [(23, -10), (30, -28), (20, -85), (45, -85)]
+# (y,z): 벽에 1.7mm 물리는 지점(떠있지 않게). 정크션뒤 + 핸들하부 앞·뒤. 헤드=캐리어가, 앞상부=트리거핀이 체결. IMU구간 회피
+SEAM_BOSS = [(31, -28), (19, -85), (47, -85)]
 for (by, bz) in SEAM_BOSS:
-    body = body.union(cq.Workplane("YZ", origin=(0, by, bz)).circle(3.2).extrude(5, both=True))    # 내부 보스 Ø6.4, x-5..5
+    body = body.union(cq.Workplane("YZ", origin=(0, by, bz)).circle(3.2).extrude(5, both=True))    # 내부 보스 Ø6.4, x-5..5 (벽에 1.7 물림)
     body = body.cut(cq.Workplane("YZ", origin=(0, by, bz)).circle(0.85).extrude(5.2))              # 우 파일럿 Ø1.7 (M2 셀프탭)
-    body = body.cut(cq.Workplane("YZ", origin=(0, by, bz)).circle(1.4).extrude(-32))               # 좌 클리어+접근홀 Ø2.8 (옆면 외부까지 관통 → 여기로 나사 넣음)
+    body = body.cut(cq.Workplane("YZ", origin=(0, by, bz)).circle(1.4).extrude(-32))               # 좌 클리어+접근홀 Ø2.8 (옆면 외부까지 → 여기로 나사)
 
 cq.exporters.export(body, f"{OUT}/grip_body_v3.step")
 cq.exporters.export(body, f"{OUT}/grip_body_v3.stl")   # 조립체(검증/렌더용)
