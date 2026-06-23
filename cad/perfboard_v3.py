@@ -13,8 +13,8 @@ import matplotlib.pyplot as plt
 from mpl_toolkits.mplot3d.art3d import Poly3DCollection
 
 OUT = "/home/minsung/dev_ws/BandLeadDevice/cad/out"
-BW, BL, BT = 40.0, 18.0, 1.5          # 보드 가로×세로×두께 (조이스틱 뒤 스트립)
-BC = (0, 16)                          # 보드 중심 XY (y7..25, 큰 조이스틱 뒤)
+BW, BL, BT = 40.0, 16.0, 1.5          # 보드 가로×세로×두께 (조이스틱 뒤 스트립)
+BC = (0, 15)                          # 보드 중심 XY (y7..23, 뒷 스커트 회피)
 BZ = -7.75                            # 보드 중심 z (top -7, bottom -8.5)
 BTN = {"torque": (-11, 16), "kbd": (11, 16)}    # 택트2 (캐리어 버튼홀과 정렬)
 POSTS = [(-16, 10), (16, 10), (-16, 22), (16, 22)]  # 캐리어 스탠드오프와 동일
@@ -24,8 +24,7 @@ board = cq.Workplane("XY", origin=(BC[0], BC[1], BZ - BT / 2)).box(BW, BL, BT, c
 def hole(b, x, y, d):    # 월드 절대좌표 cut
     return b.cut(cq.Workplane("XY", origin=(x, y, BZ + 2)).circle(d / 2).extrude(-(BT + 4)))
 
-for (px, py) in POSTS:                       # 스탠드오프 마운트홀 Ø2.2
-    board = hole(board, px, py, 2.2)
+# 마운트홀 없음 — 보드는 캐리어 슬라이드 레일에 끼움(타공 불필요). 좌우 edge(x±20)가 레일에 물림
 # 택트는 보드 표면에 얹고 핀만 그리드에 납땜 → 컷 없음. 핀 위치만 Ø1로 표시
 for nm, (bx, by) in BTN.items():
     for dx, dy in [(-2.5, -2.5), (2.5, -2.5), (-2.5, 2.5), (2.5, 2.5)]:   # 6×6 택트 4핀

@@ -49,7 +49,7 @@ for deg in [0, 4, 8, 12, 16]:
         issues.append(f"트리거 {deg}°에서 그립과 간섭 {round(v)}mm³ (걸림)")
 
 print("=== 3) 파트 간 간섭 ===")
-pairs = [(cc, g, "캐리어↔그립", 200), (cc, lev, "캐리어↔레버", 60), (pb, g, "보드↔그립(cavity)", 80)]
+pairs = [(cc, g, "캐리어↔그립", 200), (cc, lev, "캐리어↔레버", 60), (pb, g, "보드↔그립(cavity)", 80), (cc, pb, "캐리어↔보드(레일끼움)", 40)]
 for a, b, nm, lim in pairs:
     it = trimesh.boolean.intersection([a, b], engine="manifold")
     v = 0 if (it is None or it.is_empty) else it.volume
@@ -93,8 +93,8 @@ checks = [
     ("조이스틱 스탠드오프 솔리드(캐리어)", cc, (16, 4.7, -5), True),
     ("조이스틱 스탠드오프 파일럿(빔)", cc, (14.55, 4.7, -5), False),
     ("조이스틱 돔홀(빔)", cc, (0, -7, -1.5), False),
-    ("PCB 스탠드오프 솔리드(캐리어)", cc, (17, 10, -5), True),
-    ("PCB 스탠드오프 파일럿(빔)", cc, (16, 10, -5), False),
+    ("보드 레일 바깥벽(솔리드)", cc, (20.8, 15, -6), True),
+    ("보드 레일 채널(빔, 보드 끼는곳)", cc, (19, 15, -7.7), False),
     ("버튼 torque홀(빔)", cc, (-11, 16, -1.5), False),
     ("버튼 kbd홀(빔)", cc, (11, 16, -1.5), False),
     ("버튼홀 안막힘(스탠드오프와 분리)", cc, (-13, 16, -1.5), False),

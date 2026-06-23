@@ -14,13 +14,13 @@ OUT = "/home/minsung/dev_ws/BandLeadDevice/cad/out"
 c = trimesh.load(f"{OUT}/carrier_v3.stl")
 JOY = (0, -7); gx, gy = 29.1, 23.4   # 실측 KY-023 마운트(눕힘)
 BTN = {"torque": (-11, 16), "kbd": (11, 16)}
-POSTS = [(-16, 10), (16, 10), (-16, 22), (16, 22)]
+POSTS = [(-20.8, 15), (20.8, 15)]    # 보드 드롭인 레일(양옆)
 JOY_POSTS = [(JOY[0] + dx, JOY[1] + dy) for dx in (-gx / 2, gx / 2) for dy in (-gy / 2, gy / 2)]
 
 labels = [("돔홀 Ø18\n(조이스틱 스틱)", (*JOY, 0), "green")]
 labels += [("조이스틱 스탠드오프\nM2(모듈 고정)", (x, y, -5), "darkorange") for (x, y) in JOY_POSTS]
 labels += [(f"버튼홀 Ø8\n({k})", (x, y, 0), "red") for k, (x, y) in BTN.items()]
-labels += [("PCB 스탠드오프\nM2(보드 고정)", (x, y, -5), "blue") for (x, y) in POSTS]
+labels += [("보드 드롭인 레일", (x, y, -5), "blue") for (x, y) in POSTS]
 
 fig = plt.figure(figsize=(15, 7))
 for k, (el, az, ttl) in enumerate([(88, -90, "top (윗면 — 버튼·돔 둥근홀)"), (-88, -90, "bottom (밑면 — 스탠드오프 M2)"), (20, -60, "iso")]):
