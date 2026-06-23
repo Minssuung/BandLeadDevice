@@ -22,7 +22,7 @@ FT = 3.0; SK = 11.0
 HKW = 6.0; LIP_OUT = 2.0; SLOT_W = 1.2
 CATCH_Z = -8.0; LIP_BOT = -11.0; WIN_BOT, WIN_TOP = -12.0, -7.5
 sx, sy = HEAD[0] / 2 - (WALL + CLR), HEAD[1] / 2 - (WALL + CLR)   # 스커트 외곽 반치수
-hooks = [(sx, 0, 1, 0), (-sx, 0, -1, 0), (0, sy, 0, 1)]   # -Y 훅 제거(트리거 자리)
+hooks = [(sx, 0, 1, 0), (-sx, 0, -1, 0), (0, sy, 0, 1), (13, -sy, 0, -1), (-13, -sy, 0, -1)]  # 앞훅2 트리거슬롯 양옆
 
 
 def repair(m):
