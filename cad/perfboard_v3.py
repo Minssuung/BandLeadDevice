@@ -18,7 +18,7 @@ BC = (0, -2)                          # 보드 중심 XY
 BZ = -7.75                            # 보드 중심 z (top -7, bottom -8.5)
 JOY = (0, -9); gx, gy = PT.JOY_MOUNT_GRID
 BTN = {"A": (-14, 14), "B": (0, 14), "menu": (14, 14)}
-POSTS = [(-18, -18), (18, -18), (-18, 16), (18, 16)]
+POSTS = [(-18, -8), (18, -8), (-18, 6), (18, 6)]   # 캐리어 스탠드오프와 동일(버튼홀 침범 회피)
 
 board = cq.Workplane("XY", origin=(BC[0], BC[1], BZ - BT / 2)).box(BW, BL, BT, centered=(True, True, False))
 # 앞중앙 노치 — 트리거 보스/홀바 자리 비움 (조이스틱 마운트 ±13.5는 보존)

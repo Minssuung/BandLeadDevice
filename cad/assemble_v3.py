@@ -51,7 +51,7 @@ for nm, (bx, by) in BTN.items():
 cq.exporters.export(caps, f"{OUT}/button_caps_v3.stl")
 print("button_caps vol:", round(caps.val().Volume()))
 # PCB(만능보드) 스탠드오프 4 — 캐리어 밑면(z-3)서 z-7로, 조이스틱(±13)·스커트(±24) 사이
-PCB_POSTS = [(-18, -18), (18, -18), (-18, 16), (18, 16)]
+PCB_POSTS = [(-18, -8), (18, -8), (-18, 6), (18, 6)]   # 옆쪽(조이스틱 ±13·버튼 y14 사이) — 버튼홀 안 침범
 for (px, py) in PCB_POSTS:
     post = cq.Workplane("XY", origin=(px, py, -FT)).circle(2.3).extrude(-4)        # z-3..-7
     post = post.faces("<Z").workplane().circle(0.85).cutBlind(-3)                   # M2 파일럿(위로)

@@ -14,7 +14,7 @@ OUT = "/home/minsung/dev_ws/BandLeadDevice/cad/out"
 c = trimesh.load(f"{OUT}/carrier_v3.stl")
 JOY = (0, -9)
 BTN = {"A": (-14, 14), "B": (0, 14), "menu": (14, 14)}
-POSTS = [(-18, -18), (18, -18), (-18, 16), (18, 16)]
+POSTS = [(-18, -8), (18, -8), (-18, 6), (18, 6)]
 
 labels = [("돔홀 Ø18\n(조이스틱 스틱)", (*JOY, 0), "green")]
 labels += [(f"버튼홀 Ø8\n({k}, 캡)", (x, y, 0), "red") for k, (x, y) in BTN.items()]
