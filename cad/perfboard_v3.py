@@ -21,19 +21,20 @@ BTN = {"A": (-14, 14), "B": (0, 14), "menu": (14, 14)}
 POSTS = [(-18, -8), (18, -8), (-18, 6), (18, 6)]   # 캐리어 스탠드오프와 동일(버튼홀 침범 회피)
 
 board = cq.Workplane("XY", origin=(BC[0], BC[1], BZ - BT / 2)).box(BW, BL, BT, centered=(True, True, False))
-# 앞중앙 노치 — 트리거 보스/홀바 자리 비움 (조이스틱 마운트 ±13.5는 보존)
-board = board.cut(cq.Workplane("XY", origin=(0, -21, BZ)).box(20, 12, 5))
-# 스탠드오프 마운트홀 (Ø2.2)
-for (px, py) in POSTS:
-    board = board.faces(">Z").workplane().moveTo(px, py).hole(2.2)
-# 조이스틱 마운트홀 4 (27×20) + 스틱 클리어 (Ø12)
-board = board.faces(">Z").workplane().moveTo(*JOY).hole(12)
-for dx in (-gx / 2, gx / 2):
+# 앞중앙 노치 — 트리거 보스(x≤11) 비움(x±12), 조이스틱 마운트(±13.5)는 보존
+board = board.cut(cq.Workplane("XY", origin=(0, -21, BZ)).box(24, 12, 5))
+# 구멍은 월드 절대좌표로 cut (face-center workplane이 BC만큼 밀던 버그 회피)
+def hole(b, x, y, d):
+    return b.cut(cq.Workplane("XY", origin=(x, y, BZ + 2)).circle(d / 2).extrude(-(BT + 4)))
+
+for (px, py) in POSTS:                       # 스탠드오프 마운트홀 Ø2.2
+    board = hole(board, px, py, 2.2)
+board = hole(board, JOY[0], JOY[1], 12)      # 스틱 클리어 Ø12
+for dx in (-gx / 2, gx / 2):                 # 조이스틱 마운트홀 4 (27×20)
     for dy in (-gy / 2, gy / 2):
-        board = board.faces(">Z").workplane().moveTo(JOY[0] + dx, JOY[1] + dy).hole(2.2)
-# 택트 핀 통로 (각 버튼 4핀 ~ 단순화: 5×5 관통)
-for nm, (bx, by) in BTN.items():
-    board = board.faces(">Z").workplane().moveTo(bx, by).rect(5, 5).cutThruAll()
+        board = hole(board, JOY[0] + dx, JOY[1] + dy, 2.2)
+for nm, (bx, by) in BTN.items():             # 택트 핀 통로 5×5
+    board = board.cut(cq.Workplane("XY", origin=(bx, by, BZ + 2)).rect(5, 5).extrude(-(BT + 4)))
 cq.exporters.export(board, f"{OUT}/perfboard_v3.stl")
 print(f"perfboard {BW}×{BL}×{BT} @ z{BZ}, 마운트홀4 + 조이스틱4 + 택트3")
 
