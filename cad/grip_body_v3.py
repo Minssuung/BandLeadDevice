@@ -50,14 +50,14 @@ hbar = cq.Workplane("XY", origin=(0, -17.5, HALL[2])).box(22, 6, 6)             
 hbar = hbar.cut(cq.Workplane("XZ", origin=(0, -20.5, HALL[2])).rect(4.6, 3.4).extrude(-3))  # AH49E 포켓(-Y면, 앞 -20.5)
 body = body.union(hbar)
 
-# ── 리프트 SS-5GL: 벽부착 브래킷 → 포켓 + 레버창 + 나사홀 ──
-lbrk = cq.Workplane("XY", origin=(LIFT_AT[0] - 2, LIFT_AT[1], LIFT_AT[2])).box(24, 14, 26).intersect(ctrl)
+# ── 리프트 SS-5GL: 벽부착 브래킷(+X벽쪽으로 좁힘 → -X에 IMU 자리 비움) → 포켓 + 레버창 + 나사홀 ──
+lbrk = cq.Workplane("XY", origin=(13, LIFT_AT[1], LIFT_AT[2])).box(16, 14, 26).intersect(ctrl)  # x5..21.5(intersect→x5..벽), IMU(x≤1) 회피
 body = body.union(lbrk)                                                                       # 벽 부착 솔리드
 body = body.cut(cq.Workplane("XY", origin=LIFT_AT).box(SS[1] + 0.6, SS[2] + 0.6, SS[0] + 0.6))  # 스위치 포켓
 body = body.cut(cq.Workplane("XY", origin=(LIFT_AT[0] + 8, LIFT_AT[1], LIFT_AT[2])).box(18, 4, 6))  # 레버창(측면)
 for dz in (-3.2, 3.2):                                                                        # SS-5GL 고정 나사홀 (실측: 피치6.4, Ø2.3)
-    body = body.cut(cq.Workplane("YZ", origin=(LIFT_AT[0] - SS[1] / 2, LIFT_AT[1], LIFT_AT[2] + dz)).circle(1.15).extrude(-5))
-body = body.cut(cq.Workplane("XY", origin=(2, LIFT_AT[1], LIFT_AT[2])).box(16, 4, 6))         # 배선 슬롯: 포켓 -X면 → cavity (단자 2선이 위 허브보드로)
+    body = body.cut(cq.Workplane("YZ", origin=(LIFT_AT[0] - SS[1] / 2, LIFT_AT[1], LIFT_AT[2] + dz)).circle(1.15).extrude(-3))
+body = body.cut(cq.Workplane("XY", origin=(8, LIFT_AT[1], LIFT_AT[2])).box(8, 4, 6))          # 배선 슬롯: 포켓 -X면 → cavity (단자 2선)
 
 # ── IMU 백킹 플레이트 (-X벽 부착, 손잡이형상 intersect로 벽에 확실히 붙음) + 나사홀2 ──
 ca, sa = np.cos(np.radians(IMU_TILT)), np.sin(np.radians(IMU_TILT))
