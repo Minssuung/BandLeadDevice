@@ -89,7 +89,8 @@ body = body.union(cq.Workplane("XY", origin=(7.5, -22, C[2] + 2.75)).box(2, 3, 4
 body = body.cut(cq.Workplane("XY", origin=(0, -26, -16)).box(13, 10, 26))
 
 # ── 클램쉘: 시임(x=0) 나사보스(축X) — 우=파일럿(M2셀프탭), 좌=클리어. 부품 회피 시임벽 지점 ──
-SEAM_BOSS = [(26, -10), (42, -58), (46, -85)]   # (y,z): 헤드 뒤, 핸들 뒤, 핸들 뒤하부
+# (y,z): 헤드뒤 + 정크션뒤 + 핸들하부 앞·뒤. 앞쪽 상부는 트리거 핀(양쪽보스 관통)+캐리어가 체결. IMU구간(z-34..-76) 회피
+SEAM_BOSS = [(26, -10), (33, -28), (16, -85), (48, -85)]
 for (by, bz) in SEAM_BOSS:
     body = body.union(cq.Workplane("YZ", origin=(0, by, bz)).circle(3.2).extrude(4, both=True))   # 보스 Ø6.4, x-4..4
     body = body.cut(cq.Workplane("YZ", origin=(0, by, bz)).circle(0.85).extrude(5, both=True))     # 파일럿 Ø1.7 관통
