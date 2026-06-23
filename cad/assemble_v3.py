@@ -17,7 +17,7 @@ import parts as PT
 
 OUT = "/home/minsung/dev_ws/BandLeadDevice/cad/out"
 HEAD = (56, 58); HEAD_R = 11; WALL = 3.0; CLR = PT.FDM_CLEAR
-JOY = (0, -9); BTN = {"A": (-16, 19), "B": (0, 23), "menu": (16, 19)}   # 스틱 뒤·구멍이 플랜지 모서리 안에(림 확보)
+JOY = (0, -9); BTN = {"A": (-14, 14), "B": (0, 14), "menu": (14, 14)}   # 스틱 뒤 한 줄, 모든 훅서 떨어짐(B 메움 방지)
 FT = 3.0; SK = 11.0
 HKW = 6.0; LIP_OUT = 2.0; SLOT_W = 1.2
 CATCH_Z = -8.0; LIP_BOT = -11.0; WIN_BOT, WIN_TOP = -12.0, -7.5
@@ -41,7 +41,9 @@ jx, jy = JOY; gx, gy = PT.JOY_MOUNT_GRID
 carrier = carrier.faces(">Z").workplane().moveTo(jx, jy).hole(PT.JOY_DOME_DIA)
 for dx in (-gx / 2, gx / 2):
     for dy in (-gy / 2, gy / 2):
-        carrier = carrier.union(cq.Workplane("XY", origin=(jx + dx, jy + dy, -FT)).circle(2.4).extrude(-9).faces("<Z").workplane().circle(0.9).cutBlind(6))
+        boss = cq.Workplane("XY", origin=(jx + dx, jy + dy, -FT)).circle(2.4).extrude(-9)
+        boss = boss.faces("<Z").workplane().circle(0.9).cutBlind(-6)   # 파일럿: 보스 안으로(위로) 파임(방향 수정)
+        carrier = carrier.union(boss)
 # 버튼: 구멍 + 택트 홀더 + 누름캡(별도 출력)
 TRAVEL = 0.8; ACT_TOP = -4.5
 caps = None
