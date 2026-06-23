@@ -37,6 +37,7 @@ for f, exp in [("grip_body_v3", 1), ("carrier_v3", 1), ("button_caps_v3", 3), ("
         issues.append(f"{f} not watertight")
 
 g = repair(load("grip_body_v3")); cc = repair(load("carrier_v3")); lev = repair(load("trigger_lever_v3"))
+pb = repair(load("perfboard_v3"))
 
 print("=== 2) 트리거 전구간 스윙 vs 그립 ===")
 for deg in [0, 4, 8, 12, 16]:
@@ -48,7 +49,8 @@ for deg in [0, 4, 8, 12, 16]:
         issues.append(f"트리거 {deg}°에서 그립과 간섭 {round(v)}mm³ (걸림)")
 
 print("=== 3) 파트 간 간섭 ===")
-for a, b, nm, lim in [(cc, g, "캐리어↔그립", 200), (cc, lev, "캐리어↔레버", 60)]:
+pairs = [(cc, g, "캐리어↔그립", 200), (cc, lev, "캐리어↔레버", 60), (pb, g, "보드↔그립(cavity)", 80)]
+for a, b, nm, lim in pairs:
     it = trimesh.boolean.intersection([a, b], engine="manifold")
     v = 0 if (it is None or it.is_empty) else it.volume
     print(f"  {nm}: {round(v)} mm³")
@@ -69,8 +71,12 @@ checks = [
     ("앞훅 캐치(그립 솔리드, 창 위)", g, (13, -27.5, -5), True),
     ("앞훅 창(빔)", g, (13, -27.5, -10), False),
     ("리프트 +X벽(스위치 Y끝 솔리드, 창 옆)", g, (15.5, 13.5, -34), True),
-    ("조이스틱 보스 파일럿(빔)", cc, (13.5, 1, -9), False),
-    ("조이스틱 보스 솔리드(파일럿 옆)", cc, (15, 1, -9), True),
+    ("PCB 스탠드오프 솔리드(캐리어)", cc, (19, 16, -5), True),
+    ("PCB 스탠드오프 파일럿(빔)", cc, (18, 16, -5), False),
+    ("조이스틱 스틱컷Ø12(보드 빔)", pb, (0, -9, -7.75), False),
+    ("택트 핀통로(보드 빔)", pb, (0, 14, -7.75), False),
+    ("보드 솔리드", pb, (8, 8, -7.75), True),
+    ("보드 노치(앞중앙 빔)", pb, (0, -20, -7.75), False),
     ("버튼B 구멍(빔)", cc, (0, 14, -1.5), False),
     ("버튼B 택트포켓(빔)", cc, (0, 14, -6), False),
     ("버튼A 구멍(빔, 대조)", cc, (-14, 14, -1.5), False),

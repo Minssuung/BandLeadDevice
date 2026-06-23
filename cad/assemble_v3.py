@@ -37,28 +37,25 @@ sko = cq.Workplane("XY", origin=(0, 0, -FT)).box(2 * sx, 2 * sy, SK, centered=(T
 ski = cq.Workplane("XY", origin=(0, 0, -FT + 0.5)).box(2 * sx - 4, 2 * sy - 4, SK + 1, centered=(True, True, False)).translate((0, 0, -SK - 1))
 carrier = flange.union(sko.cut(ski))
 # 조이스틱 돔 + 4 보스
-jx, jy = JOY; gx, gy = PT.JOY_MOUNT_GRID
-carrier = carrier.faces(">Z").workplane().moveTo(jx, jy).hole(PT.JOY_DOME_DIA)
-for dx in (-gx / 2, gx / 2):
-    for dy in (-gy / 2, gy / 2):
-        boss = cq.Workplane("XY", origin=(jx + dx, jy + dy, -FT)).circle(2.4).extrude(-9)
-        boss = boss.faces("<Z").workplane().circle(0.9).cutBlind(-6)   # 파일럿: 보스 안으로(위로) 파임(방향 수정)
-        carrier = carrier.union(boss)
-# 버튼: 구멍 + 택트 홀더 + 누름캡(별도 출력)
-TRAVEL = 0.8; ACT_TOP = -4.5
+jx, jy = JOY
+# 조이스틱·택트는 PCB(만능보드)에 실장 → 캐리어는 돔홀 + 버튼홀만 (PCB 중심 구조)
+carrier = carrier.faces(">Z").workplane().moveTo(jx, jy).hole(PT.JOY_DOME_DIA)   # 스틱 돔홀(스틱은 보드서 돌출)
+# 버튼: 구멍 Ø8 + 누름캡(디스크+스템). 플랜지/슬릿 불필요 — 아래 보드 위 택트가 캡을 잡아줌
+ACT_TOP = -2.5   # 보드(z-7) 위 택트 액추에이터 top z
 caps = None
 for nm, (bx, by) in BTN.items():
     carrier = carrier.faces(">Z").workplane().moveTo(bx, by).hole(8.0)
-    holder = (cq.Workplane("XY", origin=(bx, by, -9)).box(9, 9, 6, centered=(True, True, False))
-              .faces(">Z").workplane().rect(6.6, 6.6).cutBlind(-5.5))   # 택트 6.4 포켓(액추에이터 위)
-    carrier = carrier.union(holder)
-    cap = (cq.Workplane("XY", origin=(bx, by, TRAVEL)).circle(5).extrude(2)                 # 디스크(돌출)
-           .union(cq.Workplane("XY", origin=(bx, by, TRAVEL)).circle(2.9).extrude(ACT_TOP - TRAVEL))  # 스템→액추에이터
-           .union(cq.Workplane("XY", origin=(bx, by, -FT)).circle(4.4).extrude(-1.0)))      # 리테이너 플랜지
-    cap = cap.cut(cq.Workplane("XY", origin=(bx, by, -2)).box(0.9, 12, 5))                   # 압축 슬릿(플랜지 삽입 가능하게)
+    cap = (cq.Workplane("XY", origin=(bx, by, 0.8)).circle(5).extrude(2)                  # 디스크(0.8 돌출)
+           .union(cq.Workplane("XY", origin=(bx, by, 0.8)).circle(2.9).extrude(ACT_TOP - 0.8)))  # 스템→택트
     caps = cap if caps is None else caps.union(cap)
 cq.exporters.export(caps, f"{OUT}/button_caps_v3.stl")
 print("button_caps vol:", round(caps.val().Volume()))
+# PCB(만능보드) 스탠드오프 4 — 캐리어 밑면(z-3)서 z-7로, 조이스틱(±13)·스커트(±24) 사이
+PCB_POSTS = [(-18, -18), (18, -18), (-18, 16), (18, 16)]
+for (px, py) in PCB_POSTS:
+    post = cq.Workplane("XY", origin=(px, py, -FT)).circle(2.3).extrude(-4)        # z-3..-7
+    post = post.faces("<Z").workplane().circle(0.85).cutBlind(-3)                   # M2 파일럿(위로)
+    carrier = carrier.union(post)
 
 def make_lip(hx, hy, dx, dy):
     if dx:
