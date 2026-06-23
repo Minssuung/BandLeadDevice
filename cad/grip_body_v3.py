@@ -55,8 +55,8 @@ lbrk = cq.Workplane("XY", origin=(LIFT_AT[0] - 2, LIFT_AT[1], LIFT_AT[2])).box(2
 body = body.union(lbrk)                                                                       # 벽 부착 솔리드
 body = body.cut(cq.Workplane("XY", origin=LIFT_AT).box(SS[1] + 0.6, SS[2] + 0.6, SS[0] + 0.6))  # 스위치 포켓
 body = body.cut(cq.Workplane("XY", origin=(LIFT_AT[0] + 8, LIFT_AT[1], LIFT_AT[2])).box(18, 4, 6))  # 레버창(측면)
-for dz in (-6, 6):                                                                            # 스위치 고정 나사홀
-    body = body.cut(cq.Workplane("YZ", origin=(LIFT_AT[0] - SS[1] / 2, LIFT_AT[1], LIFT_AT[2] + dz)).circle(0.9).extrude(-5))
+for dz in (-3.2, 3.2):                                                                        # SS-5GL 고정 나사홀 (실측: 피치6.4, Ø2.3)
+    body = body.cut(cq.Workplane("YZ", origin=(LIFT_AT[0] - SS[1] / 2, LIFT_AT[1], LIFT_AT[2] + dz)).circle(1.15).extrude(-5))
 
 # ── IMU 백킹 플레이트 (-X벽 부착, 손잡이형상 intersect로 벽에 확실히 붙음) + 나사홀2 ──
 ca, sa = np.cos(np.radians(IMU_TILT)), np.sin(np.radians(IMU_TILT))

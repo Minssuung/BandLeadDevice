@@ -14,10 +14,10 @@ from mpl_toolkits.mplot3d.art3d import Poly3DCollection
 
 OUT = "/home/minsung/dev_ws/BandLeadDevice/cad/out"
 BW, BL, BT = 40.0, 18.0, 1.5          # 보드 가로×세로×두께 (조이스틱 뒤 스트립)
-BC = (0, 15)                          # 보드 중심 XY (y6..24)
+BC = (0, 16)                          # 보드 중심 XY (y7..25, 큰 조이스틱 뒤)
 BZ = -7.75                            # 보드 중심 z (top -7, bottom -8.5)
 BTN = {"torque": (-11, 16), "kbd": (11, 16)}    # 택트2 (캐리어 버튼홀과 정렬)
-POSTS = [(-16, 8), (16, 8), (-16, 20), (16, 20)]  # 캐리어 스탠드오프와 동일
+POSTS = [(-16, 10), (16, 10), (-16, 22), (16, 22)]  # 캐리어 스탠드오프와 동일
 
 board = cq.Workplane("XY", origin=(BC[0], BC[1], BZ - BT / 2)).box(BW, BL, BT, centered=(True, True, False))
 

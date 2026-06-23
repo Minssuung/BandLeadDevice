@@ -17,7 +17,7 @@ import parts as PT
 
 OUT = "/home/minsung/dev_ws/BandLeadDevice/cad/out"
 HEAD = (56, 58); HEAD_R = 11; WALL = 3.0; CLR = PT.FDM_CLEAR
-JOY = (0, -6); BTN = {"torque": (-11, 16), "kbd": (11, 16)}   # 조이스틱 y-6(트리거허브 y-20 회피) / 버튼2 뒤
+JOY = (0, -7); BTN = {"torque": (-11, 16), "kbd": (11, 16)}   # 조이스틱 y-7(실측23.4깊이, 트리거-보드 사이) / 버튼2 뒤
 FT = 3.0; SK = 11.0
 HKW = 6.0; LIP_OUT = 2.0; SLOT_W = 1.2
 CATCH_Z = -8.0; LIP_BOT = -11.0; WIN_BOT, WIN_TOP = -12.0, -7.5
@@ -55,7 +55,7 @@ for nm, (bx, by) in BTN.items():
 cq.exporters.export(caps, f"{OUT}/button_caps_v3.stl")
 print("button_caps vol:", round(caps.val().Volume()))
 # 만능보드(택트2 + 배선 junction) 스탠드오프 4 — 조이스틱 뒤(y>4), 버튼 사이
-PCB_POSTS = [(-16, 8), (16, 8), (-16, 20), (16, 20)]
+PCB_POSTS = [(-16, 10), (16, 10), (-16, 22), (16, 22)]   # 큰 조이스틱(실측) 뒤로 비켜
 for (px, py) in PCB_POSTS:
     post = cq.Workplane("XY", origin=(px, py, -FT)).circle(2.3).extrude(-4)        # z-3..-7
     post = post.faces("<Z").workplane().circle(0.85).cutBlind(-3)                   # M2 파일럿(위로)
