@@ -70,6 +70,12 @@ for u, v in PT.IMU_MOUNT_HOLES:
     plate = plate.cut(cq.Workplane("YZ", origin=(IMU_AT[0] - 5, wy, wz)).circle(0.85).extrude(-8))  # M2 파일럿
 body = body.union(plate)
 
+# ── 허브 만능보드 트레이 ledge (그립 하부 z-16.85 안착; 스커트(-14)·조이스틱모듈(-13) 아래, 홀바 뒤) ──
+# 보드 44×36 @ (0,5) 가 양옆+뒤 3면 ledge에 위에서 드롭인. 앞은 홀바 회피로 코너만 받침
+for (ox, oy, w, d) in [(-23, 4.5, 6, 35), (23, 4.5, 6, 35), (0, 23, 48, 6)]:
+    led = cq.Workplane("XY", origin=(ox, oy, -17.15)).box(w, d, 0.6).intersect(ctrl)
+    body = body.union(led)
+
 # ── 조립 완성용 디테일 ──
 # 배선 출구 Ø8 (실제 손잡이축 통해 바닥중심(0,35,-96.5) 관통 — 원점회전 드리프트 방지)
 wire = (cq.Workplane("XY", origin=(0, 0, -15)).circle(4.0).extrude(30)

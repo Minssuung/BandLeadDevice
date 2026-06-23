@@ -14,7 +14,7 @@ OUT = "/home/minsung/dev_ws/BandLeadDevice/cad/out"
 c = trimesh.load(f"{OUT}/carrier_v3.stl")
 JOY = (0, -7); gx, gy = 29.1, 23.4   # 실측 KY-023 마운트(눕힘)
 BTN = {"torque": (-11, 16), "kbd": (11, 16)}
-POSTS = [(-20.8, 15), (20.8, 15)]    # 보드 드롭인 레일(양옆)
+POSTS = []
 JOY_POSTS = [(JOY[0] + dx, JOY[1] + dy) for dx in (-gx / 2, gx / 2) for dy in (-gy / 2, gy / 2)]
 
 labels = [("돔홀 Ø18\n(조이스틱 스틱)", (*JOY, 0), "green")]

@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
-"""만능보드(PCB) — 택트2 납땜 + 배선 junction. 조이스틱 뒤, 캐리어 스탠드오프에 마운트.
-조이스틱·홀·리프트·IMU·MAX485는 보드에 안 올라감(자기 자리 + 점퍼선).
+"""만능보드(PCB) = 중앙 배선 허브. 그립 하부 헤드(z-16)에 트레이로 드롭인.
+모든 부품(조이스틱5·홀3·리프트2·IMU/485·버튼2) 선이 여기 모임 → 바닥 케이블로 컨트롤러 밖.
+부품은 안 올라감(맨몸 택트도 캐리어로 감) — 보드는 배선 그리드 + 케이블 단자.
 실행: cad/.venv/bin/python cad/perfboard_v3.py
 """
 import os, sys
@@ -13,49 +14,31 @@ import matplotlib.pyplot as plt
 from mpl_toolkits.mplot3d.art3d import Poly3DCollection
 
 OUT = "/home/minsung/dev_ws/BandLeadDevice/cad/out"
-BW, BL, BT = 40.0, 16.0, 1.5          # 보드 가로×세로×두께 (조이스틱 뒤 스트립)
-BC = (0, 15)                          # 보드 중심 XY (y7..23, 뒷 스커트 회피)
-BZ = -7.75                            # 보드 중심 z (top -7, bottom -8.5)
-BTN = {"torque": (-11, 16), "kbd": (11, 16)}    # 택트2 (캐리어 버튼홀과 정렬)
-POSTS = [(-16, 10), (16, 10), (-16, 22), (16, 22)]  # 캐리어 스탠드오프와 동일
+BW, BL, BT = 44.0, 36.0, 1.5          # 허브보드 가로×세로×두께 (크게)
+BC = (0, 5)                           # 중심 XY (x±22, y-13..23 — 홀바 뒤·트리거 회피)
+BZ = -16.0                            # z (top -15.25, bottom -16.75; 스커트-14·조이스틱-13 아래)
 
 board = cq.Workplane("XY", origin=(BC[0], BC[1], BZ - BT / 2)).box(BW, BL, BT, centered=(True, True, False))
-
-def hole(b, x, y, d):    # 월드 절대좌표 cut
-    return b.cut(cq.Workplane("XY", origin=(x, y, BZ + 2)).circle(d / 2).extrude(-(BT + 4)))
-
-# 마운트홀 없음 — 보드는 캐리어 슬라이드 레일에 끼움(타공 불필요). 좌우 edge(x±20)가 레일에 물림
-# 택트는 보드 표면에 얹고 핀만 그리드에 납땜 → 컷 없음. 핀 위치만 Ø1로 표시
-for nm, (bx, by) in BTN.items():
-    for dx, dy in [(-2.5, -2.5), (2.5, -2.5), (-2.5, 2.5), (2.5, 2.5)]:   # 6×6 택트 4핀
-        board = hole(board, bx + dx, by + dy, 1.0)
+# 케이블 출구 슬롯(뒤쪽) + 배선 그리드 표시는 실제 만능기판이 가짐(여기선 외형만)
 cq.exporters.export(board, f"{OUT}/perfboard_v3.stl")
 import pymeshfix
 _m = trimesh.load(f"{OUT}/perfboard_v3.stl")
 if not _m.is_watertight:
     _v, _f = pymeshfix.clean_from_arrays(np.asarray(_m.vertices), np.asarray(_m.faces))
     _m = trimesh.Trimesh(_v, _f); trimesh.repair.fix_normals(_m); _m.export(f"{OUT}/perfboard_v3.stl")
-print(f"perfboard {BW}×{BL}×{BT} @ y{BC[1]} z{BZ} | 택트2+junction | watertight:", trimesh.load(f"{OUT}/perfboard_v3.stl").is_watertight)
+print(f"hub board {BW}×{BL}×{BT} @ y{BC[1]} z{BZ} | watertight:", trimesh.load(f"{OUT}/perfboard_v3.stl").is_watertight)
 
-# ── 렌더: 캐리어 + 보드 + 부품 마커 ──
-carrier = trimesh.load(f"{OUT}/carrier_v3.stl")
+# ── 렌더: 그립 + 허브보드 (그립 하부에 트레이로 안착) ──
+g = trimesh.load(f"{OUT}/grip_body_v3.stl")
 bm = trimesh.load(f"{OUT}/perfboard_v3.stl")
-gx, gy = 27, 20; JOY = (0, -9)
 fig = plt.figure(figsize=(16, 6.5))
-for k, (el, az, ttl) in enumerate([(20, -60, "iso (캐리어+보드)"), (4, -90, "front"), (90, -90, "top (배치)")]):
+for k, (el, az, ttl) in enumerate([(20, -60, "iso (그립+허브보드)"), (3, -90, "front 단면감"), (90, -90, "top (배치)")]):
     ax = fig.add_subplot(1, 3, k + 1, projection="3d")
-    ax.add_collection3d(Poly3DCollection(carrier.vertices[carrier.faces], facecolor=(.3, .55, .95), edgecolor="none", alpha=.25))
-    ax.add_collection3d(Poly3DCollection(bm.vertices[bm.faces], facecolor=(.2, .7, .3), edgecolor="none", alpha=.9))
-    ax.scatter(*JOY, BZ, c="orange", s=50); ax.text(*JOY, BZ, " 조이스틱(보드밖)", color="orange", fontsize=7)
-    for (dx, dy) in [(-gx/2,-gy/2),(-gx/2,gy/2),(gx/2,-gy/2),(gx/2,gy/2)]:
-        ax.scatter(JOY[0]+dx, JOY[1]+dy, BZ, c="darkorange", s=18)   # 조이스틱 스탠드오프
-    for nm, (bx, by) in BTN.items():
-        ax.scatter(bx, by, BZ, c="red", s=25)
-    for (px, py) in POSTS:
-        ax.scatter(px, py, BZ, c="k", s=15)
-    allp = np.vstack([carrier.vertices, bm.vertices]); c = allp.mean(0); r = (allp.max(0) - allp.min(0)).max() / 2
+    ax.add_collection3d(Poly3DCollection(g.vertices[g.faces], facecolor=(.6, .8, .6), edgecolor="none", alpha=.18))
+    ax.add_collection3d(Poly3DCollection(bm.vertices[bm.faces], facecolor=(.15, .55, .25), edgecolor="none", alpha=.95))
+    allp = np.vstack([g.vertices, bm.vertices]); c = allp.mean(0); r = (allp.max(0) - allp.min(0)).max() / 2
     ax.set_xlim(c[0]-r, c[0]+r); ax.set_ylim(c[1]-r, c[1]+r); ax.set_zlim(c[2]-r, c[2]+r)
     ax.view_init(el, az); ax.set_title(ttl, fontsize=9); ax.set_axis_off(); ax.set_box_aspect((1, 1, 1))
-fig.suptitle("만능보드(초록)=택트2+junction / 조이스틱(주황)=자체 스탠드오프, 보드 밖 / 버튼2(빨강)")
+fig.suptitle("허브 만능보드(초록) — 그립 하부 헤드(z-16)에 드롭인. 모든 부품 선이 여기 모여 바닥 케이블로")
 plt.tight_layout(); plt.savefig(f"{OUT}/perfboard_v3.png", dpi=92)
 print("saved perfboard_v3.png")

@@ -48,20 +48,16 @@ for (px, py) in JOY_POSTS:
 ACT_TOP = -2.5   # 보드(z-7) 위 택트 액추에이터 top z
 caps = None
 for nm, (bx, by) in BTN.items():
-    carrier = carrier.faces(">Z").workplane().moveTo(bx, by).hole(6.2)   # 스템 Ø5.8 가이드(꽉맞음, 안흔들림)
+    carrier = carrier.faces(">Z").workplane().moveTo(bx, by).hole(6.2)   # 버튼홀(캡 가이드)
+    holder = cq.Workplane("XY", origin=(bx, by, -9)).box(9, 9, 6, centered=(True, True, False))   # 택트 홀더 z-9..-3
+    holder = holder.cut(cq.Workplane("XY", origin=(bx, by, -9)).box(6.6, 6.6, 6, centered=(True, True, False)))  # 6.4 택트 포켓(밑서 삽입, 핀 아래로 허브보드)
+    carrier = carrier.union(holder)
     cap = (cq.Workplane("XY", origin=(bx, by, 0.8)).circle(5).extrude(2)                  # 디스크 Ø10(턱-못빠짐)+0.8돌출
            .union(cq.Workplane("XY", origin=(bx, by, 0.8)).circle(2.9).extrude(ACT_TOP - 0.8)))  # 스템 Ø5.8→택트
     caps = cap if caps is None else caps.union(cap)
 cq.exporters.export(caps, f"{OUT}/button_caps_v3.stl")
 print("button_caps vol:", round(caps.val().Volume()))
-# 만능보드 드롭인 스냅 (캐리어 밑, 타공 없이 보드 아래서 끼워 올림 — 닫힌 스커트라 슬라이드 불가)
-# 보드 40×16 @ y7..23, z-7..-8.5. 얇은 flex 바깥벽 + 아래 스냅캐치(보드 0.3 물림) + 위 스톱립
-RY0, RY1 = 7.0, 23.0; RYC, RYL = (RY0 + RY1) / 2, RY1 - RY0
-for sx in (-1, 1):
-    carrier = carrier.union(cq.Workplane("XY", origin=(sx * 20.8, RYC, -6)).box(1.0, RYL, 6))      # 얇은 flex 바깥벽 x20.3..21.3
-    carrier = carrier.union(cq.Workplane("XY", origin=(sx * 20.0, RYC, -8.8)).box(0.6, RYL, 0.4))  # 아래 스냅캐치 z-9.0..-8.6, x19.7..20.3(보드 0.3 물림)
-    carrier = carrier.union(cq.Workplane("XY", origin=(sx * 20.0, RYC, -6.7)).box(0.6, RYL, 0.4))  # 위 스톱립 z-6.9..-6.5
-carrier = carrier.union(cq.Workplane("XY", origin=(0, RY0 - 0.9, -6)).box(20, 1.5, 6))             # 앞 스톱(중앙 x±10, z-3..-9 플랜지에 연결 — 조이스틱 스탠드오프 ±14.55 피함)
+# 만능보드는 이제 그립 하부 트레이에 마운트(허브) — 캐리어엔 보드 레일 없음. 택트 핀/선은 홀더 밑으로 내려가 허브보드에 직배선
 
 def make_lip(hx, hy, dx, dy):
     if dx:
