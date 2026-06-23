@@ -36,7 +36,13 @@ for dx in (-gx / 2, gx / 2):                 # 조이스틱 마운트홀 4 (27×
 for nm, (bx, by) in BTN.items():             # 택트 핀 통로 5×5
     board = board.cut(cq.Workplane("XY", origin=(bx, by, BZ + 2)).rect(5, 5).extrude(-(BT + 4)))
 cq.exporters.export(board, f"{OUT}/perfboard_v3.stl")
-print(f"perfboard {BW}×{BL}×{BT} @ z{BZ}, 마운트홀4 + 조이스틱4 + 택트3")
+# watertight 보장 (노치 코너 non-manifold 정리)
+import pymeshfix
+_m = trimesh.load(f"{OUT}/perfboard_v3.stl")
+if not _m.is_watertight:
+    _v, _f = pymeshfix.clean_from_arrays(np.asarray(_m.vertices), np.asarray(_m.faces))
+    _m = trimesh.Trimesh(_v, _f); trimesh.repair.fix_normals(_m); _m.export(f"{OUT}/perfboard_v3.stl")
+print(f"perfboard {BW}×{BL}×{BT} @ z{BZ} | watertight:", trimesh.load(f"{OUT}/perfboard_v3.stl").is_watertight)
 
 # ── 렌더: 캐리어 + 보드 + 부품 마커 ──
 def cqmesh(p):
