@@ -73,8 +73,8 @@ body = body.union(plate)
 # ── 허브 만능보드 트레이 (그립 하부; 스커트(-14)·조이스틱모듈(-13) 아래, 홀바 뒤) ──
 # 보드 44×36 @ (0,5). 받침 ledge(z-16.85) + 위립(z-15.1)으로 Z 샌드위치(흔들림 방지). 틸트인 삽입(앞부터 넣고 뒤 내림)
 for (ox, oy, w, d) in [(-23, 4.5, 6, 35), (23, 4.5, 6, 35), (0, 23, 48, 6)]:
-    led = cq.Workplane("XY", origin=(ox, oy, -17.15)).box(w, d, 0.6).intersect(ctrl)   # 받침 top -16.85 (보드 bottom -16.75)
-    lip = cq.Workplane("XY", origin=(ox, oy, -14.85)).box(w, d, 0.5).intersect(ctrl)    # 위립 bottom -15.1 (보드 top -15.25 위, 0.15 클리어)
+    led = cq.Workplane("XY", origin=(ox, oy, -17.45)).box(w, d, 1.2).intersect(ctrl)    # 받침 1.2(top -16.85 동일, 아래로 두껍게-프린트가능)
+    lip = cq.Workplane("XY", origin=(ox, oy, -14.5)).box(w, d, 1.2).intersect(ctrl)     # 위립 1.2(bottom -15.1 동일, 위로 두껍게)
     body = body.union(led).union(lip)
 
 # ── 조립 완성용 디테일 ──
@@ -100,15 +100,9 @@ for (by, bz) in SEAM_BOSS:
     body = body.cut(cq.Workplane("YZ", origin=(-6, by, bz)).circle(2.4).extrude(-24))     # 좌 외부 카운터싱크 Ø4.8 (머리, 표면 어디든)
 
 cq.exporters.export(body, f"{OUT}/grip_body_v3.step")
-cq.exporters.export(body, f"{OUT}/grip_body_v3.stl")   # 조립체(검증/렌더용)
+cq.exporters.export(body, f"{OUT}/grip_body_v3.stl")   # 조립체(보스O, 창X) — assemble이 창 자른 뒤 좌우 분리함
 print("grip_body vol:", round(body.val().Volume()))
-# ── 좌우 분리 ──
-HB = 250
-right = body.intersect(cq.Workplane("XY", origin=(HB / 2, 0, 0)).box(HB, HB, HB))   # x>0: 리프트 SS-5GL
-left = body.intersect(cq.Workplane("XY", origin=(-HB / 2, 0, 0)).box(HB, HB, HB))    # x<0: IMU
-cq.exporters.export(right, f"{OUT}/grip_right_v3.stl")
-cq.exporters.export(left, f"{OUT}/grip_left_v3.stl")
-print("grip_right vol:", round(right.val().Volume()), "| grip_left vol:", round(left.val().Volume()))
+# 좌우 분리는 assemble_v3.py에서 창(캐리어 스냅) 자른 뒤 수행 → 출력용 반쪽에 창 포함됨
 
 # ── 렌더: iso + 앞 반단면(cavity) ──
 vv, tt = body.val().tessellate(0.4)

@@ -98,7 +98,13 @@ for (hx, hy, dx, dy) in hooks:
         win = cq.Workplane("XY", origin=(hx, hy, (WIN_BOT + WIN_TOP) / 2)).box(HKW + 1.5, 8, WIN_TOP - WIN_BOT)
     grip = grip.cut(win)
 cq.exporters.export(grip, f"{OUT}/grip_body_v3.stl")
-print("그립+창 exported")
+# ── 좌우 클램쉘 분리 (창 자른 뒤! → 출력용 반쪽에 캐리어 스냅 창 포함) ──
+HB = 250
+gright = grip.intersect(cq.Workplane("XY", origin=(HB / 2, 0, 0)).box(HB, HB, HB))   # x>0: 리프트 SS-5GL측
+gleft = grip.intersect(cq.Workplane("XY", origin=(-HB / 2, 0, 0)).box(HB, HB, HB))    # x<0: IMU측
+cq.exporters.export(gright, f"{OUT}/grip_right_v3.stl")
+cq.exporters.export(gleft, f"{OUT}/grip_left_v3.stl")
+print("그립+창 exported, 좌우 분리(창포함) exported")
 
 # ── 잠김 검증 ──
 def cqmesh(wp, tol=0.4):
