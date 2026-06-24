@@ -15,16 +15,16 @@ import parts as PT
 
 OUT = "/home/minsung/dev_ws/BandLeadDevice/cad/out"
 C = np.array([0.0, -1.0, -36.0])     # 피벗 (그립 LIFT_PIV와 동일), 축 X
-SS = np.array([0.0, 7.0, -52.0])     # 택트(6×6) 중심 (그립 TACT_AT). 플런저 -Y(레버쪽 y~4)
-PULL = 12.0                          # 당김 각
+SS = np.array([0.0, 6.8, -50.0])     # 택트(6×6) 중심 (그립 TACT_AT, 틸트 후). 플런저 -Y(레버쪽)
+PULL = 6.0                           # 당김 각 (택트 트래블 작아 실사용 ~5° 내)
 
-# ── 레버 ──
-hub = cq.Workplane("YZ", origin=(-5, C[1], C[2])).circle(4).extrude(7)                 # 허브 x-5..2 (+X쪽 줄여 토션스프링 코일 자리 x2~6)
-arm = cq.Workplane("XY", origin=(0, -4, -46.5)).box(8, 4, 23)                          # 중지 패드 암 (앞면, z-58..-35)
-nub = cq.Workplane("XY", origin=(0, -0.5, -52)).box(7, 4, 5)                           # 누름 nub (뒤, 택트 플런저 누름, 중앙)
-lever = hub.union(arm).union(nub)
+# ── 레버 (직접식: nub 없이 패드 뒷면이 택트 직접 누름). 수직으로 만들고 18° 틸트 → 손잡이 앞면 곡률 따라감 ──
+hub = cq.Workplane("YZ", origin=(-5, C[1], C[2])).circle(4).extrude(7)                 # 허브 x-5..2 (+X쪽 줄여 토션스프링 코일 자리)
+arm = cq.Workplane("XY", origin=(0, -3, -49)).box(6, 4, 24)                            # 중지 패드 암 (피벗서 수직, y-5..-1, x±3=택트포켓에 맞춤)
+lever = hub.union(arm)
 lever = lever.cut(cq.Workplane("YZ", origin=(-6, C[1], C[2])).circle((PT.TRIG_PIVOT_DIA + 0.4) / 2).extrude(12))  # 피벗 보어 Φ3.4
 lever = lever.edges("|X and <Z").fillet(1.5)
+lever = lever.rotate((C[0], C[1], C[2]), (C[0] + 1, C[1], C[2]), 18)                   # 손잡이 곡률 따라 18° 틸트
 cq.exporters.export(lever, f"{OUT}/trigger_lift_v3.stl")
 print("lift lever vol:", round(lever.val().Volume()))
 
