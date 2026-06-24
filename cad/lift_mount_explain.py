@@ -25,18 +25,18 @@ s = g.section(plane_origin=[0, 7, 0], plane_normal=[0, 1, 0])
 if s:
     for e in s.entities:
         pp = s.vertices[e.points]; ax.plot(pp[:, 0], pp[:, 2], color="gray", lw=1)
-ax.text(0, -38, "크래들=손잡이 안 솔리드 충전\n(나사 물릴 재료)", color="saddlebrown", fontsize=8, ha="center")
-ax.add_patch(plt.Rectangle((-3.55, -62.6), 7.1, 20.6, fill=False, ec="green", lw=1.5))
-ax.text(0, -52, "SS-5GL\n포켓\n(시임 중앙)", color="green", fontsize=7.5, ha="center", va="center")
+ax.text(8, -38, "SS=+X반쪽 (크래들+나사)\nIMU=-X벽 리세스", color="saddlebrown", fontsize=8, ha="center")
+ax.add_patch(plt.Rectangle((-1.05, -62.6), 7.1, 20.6, fill=False, ec="green", lw=1.5))   # +X 포켓 x-1..6
+ax.text(2.5, -52, "SS-5GL\n포켓\n(+X반쪽)", color="green", fontsize=7.5, ha="center", va="center")
+ax.add_patch(plt.Rectangle((-11.5, -60), 10, 16, fill=False, ec="darkblue", lw=1.3, ls="--"))  # IMU 리세스 -X
+ax.text(-6.5, -41, "IMU 보드\n(-X 리세스)", color="darkblue", fontsize=7.5, ha="center")
 for dz in (4.75, -4.75):
     _, z = tilt(0, dz)
-    ax.annotate("", xy=(8.5, z), xytext=(-0.5, z), arrowprops=dict(arrowstyle="->", color="red", lw=1.6))   # 시임서 +X로
-    ax.plot([-6.5, -3.55], [z, z], color="blue", lw=3, solid_capstyle="butt")                                # -X 머리 카운터보어
-ax.text(9, -47.5, "나사: 시임(-X)서\n+X로 박음\n→ +X반쪽 파일럿\n(블라인드, 바깥X)", color="red", fontsize=7.5, va="center")
-ax.text(-13, -60, "머리 카운터보어\n(-X반쪽이 덮음)", color="blue", fontsize=7.5)
-ax.axvline(0, color="purple", ls=":", lw=.8); ax.text(0.5, -40, "시임", color="purple", fontsize=7.5)
-ax.set_aspect("equal"); ax.set_xlabel("X(옆 ←→)"); ax.set_ylabel("Z(위↑)")
-ax.set_title("SS-5GL 내부고정 (y≈7 단면) — 외부구멍 0, 시임서 조립", fontsize=10); ax.grid(alpha=.3)
+    ax.annotate("", xy=(10, z), xytext=(0, z), arrowprops=dict(arrowstyle="->", color="red", lw=1.6))   # 시임서 +X로
+ax.text(10.5, -47.5, "나사: 시임서\n+X로 박음\n→ +X파일럿\n(블라인드)", color="red", fontsize=7.5, va="center")
+ax.axvline(0, color="purple", ls=":", lw=.8); ax.text(0.5, -39, "시임", color="purple", fontsize=7.5)
+ax.set_aspect("equal"); ax.set_xlabel("X(-X=IMU  +X=SS)"); ax.set_ylabel("Z(위↑)")
+ax.set_title("SS=+X / IMU=-X 분리 (y≈7 단면) — 외부구멍 0", fontsize=10); ax.grid(alpha=.3)
 # 패널2: x=0 단면 — 레버 피벗 + 토션스프링
 ax = fig.add_subplot(1, 2, 2)
 s = g.section(plane_origin=[0, 0, 0], plane_normal=[1, 0, 0])

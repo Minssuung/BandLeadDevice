@@ -15,13 +15,13 @@ import parts as PT
 
 OUT = "/home/minsung/dev_ws/BandLeadDevice/cad/out"
 C = np.array([0.0, -1.0, -36.0])     # 피벗 (그립 LIFT_PIV와 동일), 축 X
-SS = np.array([0.0, 7.0, -52.0])     # SS-5GL 중심 (그립 SS_AT). 버튼 -Y면(y1.6)
+SS = np.array([2.5, 7.0, -52.0])     # SS-5GL 중심 (그립 SS_AT, +X반쪽). 버튼 -Y면(y1.6)
 PULL = 12.0                          # 당김 각
 
 # ── 레버 ──
 hub = cq.Workplane("YZ", origin=(-5, C[1], C[2])).circle(4).extrude(7)                 # 허브 x-5..2 (+X쪽 줄여 토션스프링 코일 자리 x2~6)
 arm = cq.Workplane("XY", origin=(0, -4, -46.5)).box(8, 4, 23)                          # 중지 패드 암 (앞면, z-58..-35)
-nub = cq.Workplane("XY", origin=(0, -0.5, -52)).box(7, 4, 5)                           # 누름 nub (뒤, SS-5GL 버튼쪽)
+nub = cq.Workplane("XY", origin=(2.5, -0.5, -52)).box(7, 4, 5)                         # 누름 nub (뒤, SS-5GL 버튼쪽, +X 스위치 맞춰 이동)
 lever = hub.union(arm).union(nub)
 lever = lever.cut(cq.Workplane("YZ", origin=(-6, C[1], C[2])).circle((PT.TRIG_PIVOT_DIA + 0.4) / 2).extrude(12))  # 피벗 보어 Φ3.4
 lever = lever.edges("|X and <Z").fillet(1.5)

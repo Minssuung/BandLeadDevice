@@ -98,6 +98,12 @@ for (hx, hy, dx, dy) in hooks:
         win = cq.Workplane("XY", origin=(hx, hy, (WIN_BOT + WIN_TOP) / 2)).box(HKW + 1.5, 8, WIN_TOP - WIN_BOT)
     grip = grip.cut(win)
 cq.exporters.export(grip, f"{OUT}/grip_body_v3.stl")
+_gm = trimesh.load(f"{OUT}/grip_body_v3.stl")   # IMU 리세스 부울이 남긴 vol=0 슬리버 제거(조각/watertight 정리)
+_gm.update_faces(_gm.nondegenerate_faces()); _gm.remove_unreferenced_vertices()
+if not _gm.is_watertight:
+    _v, _f = pymeshfix.clean_from_arrays(np.asarray(_gm.vertices), np.asarray(_gm.faces))
+    _gm = trimesh.Trimesh(_v, _f); trimesh.repair.fix_normals(_gm)
+_gm.export(f"{OUT}/grip_body_v3.stl")
 # ── 좌우 클램쉘 분리 (창 자른 뒤! → 출력용 반쪽에 캐리어 스냅 창 포함) ──
 HB = 250
 gright = grip.intersect(cq.Workplane("XY", origin=(HB / 2, 0, 0)).box(HB, HB, HB))   # x>0: 리프트 SS-5GL측
