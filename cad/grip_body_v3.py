@@ -50,15 +50,17 @@ hbar = cq.Workplane("XY", origin=(0, -17.5, HALL[2])).box(22, 6, 6)             
 hbar = hbar.cut(cq.Workplane("XZ", origin=(0, -20.5, HALL[2])).rect(4.6, 3.4).extrude(-3))  # AH49E 포켓(-Y면, 앞 -20.5)
 body = body.union(hbar)
 
-# ── 리프트 SS-5GL: 벽부착 브래킷(+X벽쪽으로 좁힘 → -X에 IMU 자리 비움) → 포켓 + 레버창 + 나사홀 ──
-lbrk = cq.Workplane("XY", origin=(13, LIFT_AT[1], LIFT_AT[2])).box(16, 14, 26).intersect(ctrl)  # x5..21.5(intersect→x5..벽), IMU(x≤1) 회피
-body = body.union(lbrk)                                                                       # 벽 부착 솔리드
-# 스위치 포켓 = 시임(x0)쪽으로 열림 → 우반쪽 열고 스위치를 옆에서 눕혀 넣음. +X 백킹벽에 나사2로 고정, Y끝·바닥 지지, 좌반쪽이 시임 닫음
-body = body.cut(cq.Workplane("XY", origin=(7.5, LIFT_AT[1], LIFT_AT[2])).box(15, SS[2] + 0.6, SS[0] + 0.6))  # 포켓 x0..15 (시임 열림)
-body = body.cut(cq.Workplane("XY", origin=(LIFT_AT[0] + 8, LIFT_AT[1], LIFT_AT[2])).box(18, 4, 6))  # 레버창(측면 +X)
-for dz in (-3.2, 3.2):                                                                        # SS-5GL 고정 나사 파일럿(+X 백킹벽, 실측 피치6.4) — 스위치 시임쪽서 관통해 고정
-    body = body.cut(cq.Workplane("YZ", origin=(15, LIFT_AT[1], LIFT_AT[2] + dz)).circle(1.0).extrude(3))
-# 배선은 시임쪽 열린 포켓으로 빠짐. 스위치: +X벽 나사2 + Y끝/바닥 지지 + 좌반쪽 닫힘
+# ── 리프트 = 앞면 2단 트리거 (검지 트리거 아래, 중지가 당김) → SS-5GL을 레버가 누름 ──
+# SS-5GL: 20×6.4×10.2, 버튼/레버 윗면. 마운트홀 Ø2.4 ×2 피치9.5, 6.4 두께(±X) 관통. 시임 중앙에 두고 좌우반쪽이 캡처
+LIFT_PIV = (0, -1, -36)                          # 2단 트리거 피벗 (앞면 핸들, X핀)
+SS_AT = (0, 7, -52)                              # SS-5GL 중심 (피벗 아래-뒤, 피벗 충돌 회피로 더 아래). 버튼 -Y(레버쪽 y1.6)
+body = body.cut(cq.Workplane("XY", origin=SS_AT).box(7.1, 10.8, 20.6))                        # 포켓 (시임 중앙, 좌우반쪽 열고 눕혀 넣음)
+for dz in (-4.75, 4.75):                                                                      # 마운트홀 Ø2.4 ×2 피치9.5, ±X 두께 관통
+    body = body.cut(cq.Workplane("YZ", origin=(0, SS_AT[1], SS_AT[2] + dz)).circle(1.2).extrude(12, both=True))
+for sx in (-8, 8):                                                                            # 2단 트리거 피벗 보스 2 (앞벽 부착)
+    body = body.union(cq.Workplane("XY", origin=(sx, LIFT_PIV[1], LIFT_PIV[2])).box(4, 8, 14))
+body = body.cut(cq.Workplane("YZ", origin=(-11, LIFT_PIV[1], LIFT_PIV[2])).circle(PT.TRIG_PIVOT_DIA / 2).extrude(22))  # 피벗 핀홀 Φ3
+body = body.cut(cq.Workplane("XY", origin=(0, LIFT_PIV[1] - 1, LIFT_PIV[2] - 11)).box(11, 16, 30))  # 레버 통로 슬롯(앞면, 허브 뒤+패드 통과 넓게)
 
 # ── IMU 백킹 플레이트 (-X벽 부착, 손잡이형상 intersect로 벽에 확실히 붙음) + 나사홀2 ──
 ca, sa = np.cos(np.radians(IMU_TILT)), np.sin(np.radians(IMU_TILT))
