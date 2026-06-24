@@ -61,6 +61,8 @@ for sx in (-8, 8):                                                              
     body = body.union(cq.Workplane("XY", origin=(sx, LIFT_PIV[1], LIFT_PIV[2])).box(4, 8, 14))
 body = body.cut(cq.Workplane("YZ", origin=(-11, LIFT_PIV[1], LIFT_PIV[2])).circle(PT.TRIG_PIVOT_DIA / 2).extrude(22))  # 피벗 핀홀 Φ3
 body = body.cut(cq.Workplane("XY", origin=(0, LIFT_PIV[1] - 1, LIFT_PIV[2] - 11)).box(11, 16, 30))  # 레버 통로 슬롯(앞면, 허브 뒤+패드 통과 넓게)
+# 리프트 토션스프링: 코일은 핀 x2~6 틈(허브 줄여 확보), 그립 다리는 +X보스 위 포스트에 (레버 복귀용 — SS-5GL만으론 레버 못 밈)
+body = body.union(cq.Workplane("XY", origin=(7, LIFT_PIV[1] + 2, LIFT_PIV[2] + 5)).box(2, 3, 5))   # 그립 다리 포스트 (x6..8, 보스 부착)
 
 # ── IMU 백킹 플레이트 (-X벽 부착, 손잡이형상 intersect로 벽에 확실히 붙음) + 나사홀2 ──
 ca, sa = np.cos(np.radians(IMU_TILT)), np.sin(np.radians(IMU_TILT))
