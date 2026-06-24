@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""SS-5GL 영역 점검 — 좌우 반쪽 시임면 + 앞면 + 레버 배치.
+"""택트(중지) 영역 점검 — 좌우 반쪽 시임면 + 앞면 + 레버 배치.
 실행: cad/.venv/bin/python cad/ss_inspect.py
 """
 import os, sys
@@ -27,12 +27,12 @@ def view(ax, meshes_cols, el, az, ttl):
 fig = plt.figure(figsize=(17, 6))
 # 1) +X 반쪽(grip_right) 시임면서 봄 (-X방향 시점) → 포켓 + 파일럿
 view(fig.add_subplot(1, 3, 1, projection="3d"), [(gr, (.6, .75, .9), 1)], 12, 95,
-     "+X반쪽(grip_right) — 시임쪽서 본 SS포켓+파일럿")
-# 2) -X 반쪽(grip_left) 시임면서 봄 (+X방향 시점) → 포켓 + 카운터보어
+     "+X반쪽(grip_right) — 시임쪽서 본 택트포켓")
+# 2) -X 반쪽(grip_left) 시임면서 봄 (+X방향 시점) → 포켓 + IMU 플레이트
 view(fig.add_subplot(1, 3, 2, projection="3d"), [(gl, (.9, .8, .65), 1)], 12, -95,
-     "-X반쪽(grip_left) — 시임쪽서 본 SS포켓+카운터보어")
+     "-X반쪽(grip_left) — 택트포켓 + IMU 플레이트·홀")
 # 3) 레버(따로) 배치 — +X반쪽 + 리프트레버
 view(fig.add_subplot(1, 3, 3, projection="3d"), [(gr, (.6, .75, .9), .25), (lift, (.95, .5, .2), 1)], 10, -70,
      "리프트 레버(주황, 따로 STL)가 끼워진 모습")
-fig.suptitle("SS-5GL 영역 점검 — 포켓은 시임쪽으로 열림(스위치 눕혀 넣음), 앞은 레버통로, 레버는 별도 부품")
+fig.suptitle("택트(중지) 영역 — 중앙 포켓(좌우반쪽 캡처), 앞은 레버통로, 레버는 별도 부품")
 plt.tight_layout(); plt.savefig(f"{OUT}/ss_inspect.png", dpi=98); print("saved ss_inspect.png")
