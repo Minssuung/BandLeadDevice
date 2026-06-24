@@ -54,17 +54,15 @@ body = body.union(hbar)
 # SS-5GL: 20×6.4×10.2, 버튼/레버 윗면. 마운트홀 Ø2.4 ×2 피치9.5, 6.4 두께(±X) 관통. 시임 중앙에 두고 좌우반쪽이 캡처
 LIFT_PIV = (0, -1, -36)                          # 2단 트리거 피벗 (앞면 핸들, X핀)
 SS_AT = (0, 7, -52)                              # SS-5GL 중심 (피벗 아래-뒤, 피벗 충돌 회피로 더 아래). 버튼 -Y(레버쪽 y1.6)
-# SS-5GL 마운트(내부고정) — 손잡이 셸이 얇고 휘어서, 스위치 자리에 솔리드 크래들(손잡이 외형 내 국부충전)을 채워 나사 물릴 재료 확보
-# 크래들+포켓+나사 모두 손잡이 곡률(18°) 틸트. +X 셀프탭 파일럿 + -X 머리 카운터보어. 나사는 시임(-X)서 +X로 박아 +X반쪽에 클램프 → -X반쪽이 머리 덮음. 외부구멍 0
-cradle = cq.Workplane("XY", origin=(0, SS_AT[1] + 3, SS_AT[2])).box(22, 20, 28)               # 스위치 자리 국부 솔리드
-cradle = cradle.rotate(SS_AT, (SS_AT[0] + 1, SS_AT[1], SS_AT[2]), HANDLE_TILT).intersect(ctrl)  # 손잡이 외형으로 클립(밖으로 안 튀어나옴)
+# SS-5GL 마운트 — IMU(-X벽)와 안 부딪히게 크래들은 +X쪽만 작게(나사 물릴 재료), 앞쪽(y9 전)까지만 → -X 비워 IMU 자리. 나사머리는 -X 캐비티에 들어가 클리어(카운터보어 불필요)
+cradle = cq.Workplane("XY", origin=(5.5, SS_AT[1] - 3, SS_AT[2])).box(11, 10, 26)             # +X만(x0..11), y앞쪽(-2..8, 보드앞단 y9.6 안 막음)
+cradle = cradle.rotate(SS_AT, (SS_AT[0] + 1, SS_AT[1], SS_AT[2]), HANDLE_TILT).intersect(ctrl)  # 손잡이 외형으로 클립
 body = body.union(cradle)
 ss = cq.Workplane("XY", origin=SS_AT).box(7.1, 10.8, 20.6)                                    # 포켓 (시임 중앙)
 for dz in (-4.75, 4.75):                                                                      # 나사2 피치9.5
     zc = SS_AT[2] + dz
-    ss = ss.union(cq.Workplane("YZ", origin=(3.55, SS_AT[1], zc)).circle(0.95).extrude(5))     # +X 파일럿 Ø1.9 (크래들 5mm 물림, 블라인드)
-    ss = ss.union(cq.Workplane("YZ", origin=(-3.55, SS_AT[1], zc)).circle(2.3).extrude(-3))    # -X 머리 카운터보어 Ø4.6
-ss = ss.rotate(SS_AT, (SS_AT[0] + 1, SS_AT[1], SS_AT[2]), HANDLE_TILT)                        # 곡률 틸트(나사축 X평행 유지→시임서 박음·좌우분리 OK)
+    ss = ss.union(cq.Workplane("YZ", origin=(3.55, SS_AT[1], zc)).circle(0.95).extrude(5))     # +X 파일럿 Ø1.9 (크래들 셀프탭, 블라인드)
+ss = ss.rotate(SS_AT, (SS_AT[0] + 1, SS_AT[1], SS_AT[2]), HANDLE_TILT)                        # 곡률 틸트(나사축 X평행→시임서 박음, 머리는 -X캐비티)
 body = body.cut(ss)
 for sx in (-8, 8):                                                                            # 2단 트리거 피벗 보스 2 (앞벽 부착)
     body = body.union(cq.Workplane("XY", origin=(sx, LIFT_PIV[1], LIFT_PIV[2])).box(4, 8, 14))
