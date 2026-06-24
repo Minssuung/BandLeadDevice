@@ -5,7 +5,7 @@
 """
 import sys
 import matplotlib
-matplotlib.use("Agg")
+matplotlib.use("Agg"); matplotlib.rcParams["font.family"]="Noto Sans CJK KR"; matplotlib.rcParams["axes.unicode_minus"]=False
 import matplotlib.pyplot as plt
 import numpy as np
 import cadquery as cq

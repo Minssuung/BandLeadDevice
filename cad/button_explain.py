@@ -6,7 +6,7 @@ import os, sys
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import numpy as np
 import trimesh
-import matplotlib; matplotlib.use("Agg")
+import matplotlib; matplotlib.use("Agg"); matplotlib.rcParams["font.family"]="Noto Sans CJK KR"; matplotlib.rcParams["axes.unicode_minus"]=False
 import matplotlib.pyplot as plt
 
 OUT = "/home/minsung/dev_ws/BandLeadDevice/cad/out"

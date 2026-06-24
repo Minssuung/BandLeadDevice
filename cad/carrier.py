@@ -9,7 +9,7 @@ import numpy as np
 from scipy.spatial import ConvexHull
 import open3d as o3d
 import cadquery as cq
-import matplotlib; matplotlib.use("Agg")
+import matplotlib; matplotlib.use("Agg"); matplotlib.rcParams["font.family"]="Noto Sans CJK KR"; matplotlib.rcParams["axes.unicode_minus"]=False
 import matplotlib.pyplot as plt
 from mpl_toolkits.mplot3d.art3d import Poly3DCollection
 import parts as PT

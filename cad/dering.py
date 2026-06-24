@@ -4,7 +4,7 @@
 union 실패 시 Compound(불린 없음)로 export·렌더하고 어디서 실패했는지 보고.
 """
 import numpy as np, traceback
-import matplotlib; matplotlib.use("Agg")
+import matplotlib; matplotlib.use("Agg"); matplotlib.rcParams["font.family"]="Noto Sans CJK KR"; matplotlib.rcParams["axes.unicode_minus"]=False
 import matplotlib.pyplot as plt
 from mpl_toolkits.mplot3d.art3d import Poly3DCollection
 import cadquery as cq

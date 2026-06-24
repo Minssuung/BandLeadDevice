@@ -9,7 +9,7 @@ import trimesh
 import pymeshfix
 from scipy.spatial import ConvexHull
 from shapely.geometry import Polygon
-import matplotlib; matplotlib.use("Agg")
+import matplotlib; matplotlib.use("Agg"); matplotlib.rcParams["font.family"]="Noto Sans CJK KR"; matplotlib.rcParams["axes.unicode_minus"]=False
 import matplotlib.pyplot as plt
 
 OUT = "/home/minsung/dev_ws/BandLeadDevice/cad/out"
