@@ -90,14 +90,14 @@ body = body.cut(cq.Workplane("XY", origin=(0, -26, -16)).box(13, 10, 26))
 # ── 클램쉘: 시임(x=0) 나사보스(축X) — 우=파일럿(M2셀프탭), 좌=클리어. 부품 회피 시임벽 지점 ──
 # (y,z): 정크션뒤 + 핸들하부 앞·뒤. 헤드=캐리어가, 앞상부=트리거핀이 체결. IMU구간 회피
 # 나사 다리 = 벽~벽 솔리드 bridge(cavity 가로지름) → 나사가 솔리드 안으로만 지나감(노출X). 좌 외부 카운터싱크(머리 flush)
-# 단면 중앙에 둬 전체폭 채움(앞뒤 다 당김). 정크션 + 하부핸들 2 (IMU구간 z-34..-76 회피). 케이블은 다리 옆(y<28)으로 지나감
-SEAM_BOSS = [(16, -28), (32, -80), (32, -88)]
+# 벽쪽(앞·뒤) 위치 — 가운데는 케이블 길로 비움. 나사를 Ø7 솔리드 튜브로 감싸 cavity 노출 없음. 정크션뒤+하부 앞·뒤
+SEAM_BOSS = [(31, -28), (19, -85), (47, -85)]
 for (by, bz) in SEAM_BOSS:
-    bar = cq.Workplane("YZ", origin=(0, by, bz)).rect(8, 8).extrude(44, both=True).intersect(ctrl)  # 벽~벽 솔리드 다리
-    body = body.union(bar)
+    tube = cq.Workplane("YZ", origin=(0, by, bz)).circle(3.5).extrude(40, both=True).intersect(ctrl)  # Ø7 솔리드 튜브(벽~벽, 나사 감쌈)
+    body = body.union(tube)
     body = body.cut(cq.Workplane("YZ", origin=(0, by, bz)).circle(0.85).extrude(22))     # 우 파일럿 Ø1.7 (M2 셀프탭)
-    body = body.cut(cq.Workplane("YZ", origin=(0, by, bz)).circle(1.5).extrude(-22))      # 좌 클리어 Ø3 (다리 안)
-    body = body.cut(cq.Workplane("YZ", origin=(-15, by, bz)).circle(2.4).extrude(-12))    # 좌 외부 카운터싱크 Ø4.8 (머리 flush)
+    body = body.cut(cq.Workplane("YZ", origin=(0, by, bz)).circle(1.5).extrude(-22))      # 좌 클리어 Ø3 (튜브 안)
+    body = body.cut(cq.Workplane("YZ", origin=(-6, by, bz)).circle(2.4).extrude(-24))     # 좌 외부 카운터싱크 Ø4.8 (머리, 표면 어디든)
 
 cq.exporters.export(body, f"{OUT}/grip_body_v3.step")
 cq.exporters.export(body, f"{OUT}/grip_body_v3.stl")   # 조립체(검증/렌더용)
