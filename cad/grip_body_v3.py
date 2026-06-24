@@ -53,11 +53,10 @@ body = body.union(hbar)
 # ── 리프트 SS-5GL: 벽부착 브래킷(+X벽쪽으로 좁힘 → -X에 IMU 자리 비움) → 포켓 + 레버창 + 나사홀 ──
 lbrk = cq.Workplane("XY", origin=(13, LIFT_AT[1], LIFT_AT[2])).box(16, 14, 26).intersect(ctrl)  # x5..21.5(intersect→x5..벽), IMU(x≤1) 회피
 body = body.union(lbrk)                                                                       # 벽 부착 솔리드
-body = body.cut(cq.Workplane("XY", origin=LIFT_AT).box(SS[1] + 0.6, SS[2] + 0.6, SS[0] + 0.6))  # 스위치 포켓
-body = body.cut(cq.Workplane("XY", origin=(LIFT_AT[0] + 8, LIFT_AT[1], LIFT_AT[2])).box(18, 4, 6))  # 레버창(측면)
-for dz in (-3.2, 3.2):                                                                        # SS-5GL 고정 나사홀 (실측: 피치6.4, Ø2.3)
-    body = body.cut(cq.Workplane("YZ", origin=(LIFT_AT[0] - SS[1] / 2, LIFT_AT[1], LIFT_AT[2] + dz)).circle(1.15).extrude(-3))
-body = body.cut(cq.Workplane("XY", origin=(8, LIFT_AT[1], LIFT_AT[2])).box(8, 4, 6))          # 배선 슬롯: 포켓 -X면 → cavity (단자 2선)
+# 스위치 포켓 = 시임(x0)쪽으로 열림 → 우반쪽 열고 스위치를 옆에서 눕혀 넣음. +X벽·Y끝·바닥이 잡고, 좌반쪽이 시임 닫음
+body = body.cut(cq.Workplane("XY", origin=(7.5, LIFT_AT[1], LIFT_AT[2])).box(15, SS[2] + 0.6, SS[0] + 0.6))  # 포켓 x0..15 (시임 열림)
+body = body.cut(cq.Workplane("XY", origin=(LIFT_AT[0] + 8, LIFT_AT[1], LIFT_AT[2])).box(18, 4, 6))  # 레버창(측면 +X)
+# 배선은 시임쪽 열린 포켓으로 자연스레 빠짐(별도 슬롯 불필요). 스위치는 압입+좌반쪽 닫힘으로 고정(필요시 글루)
 
 # ── IMU 백킹 플레이트 (-X벽 부착, 손잡이형상 intersect로 벽에 확실히 붙음) + 나사홀2 ──
 ca, sa = np.cos(np.radians(IMU_TILT)), np.sin(np.radians(IMU_TILT))
@@ -89,12 +88,16 @@ body = body.union(cq.Workplane("XY", origin=(7.5, -22, C[2] + 2.75)).box(2, 3, 4
 body = body.cut(cq.Workplane("XY", origin=(0, -26, -16)).box(13, 10, 26))
 
 # ── 클램쉘: 시임(x=0) 나사보스(축X) — 우=파일럿(M2셀프탭), 좌=클리어. 부품 회피 시임벽 지점 ──
-# (y,z): 벽에 1.7mm 물리는 지점(떠있지 않게). 정크션뒤 + 핸들하부 앞·뒤. 헤드=캐리어가, 앞상부=트리거핀이 체결. IMU구간 회피
-SEAM_BOSS = [(31, -28), (19, -85), (47, -85)]
+# (y,z): 정크션뒤 + 핸들하부 앞·뒤. 헤드=캐리어가, 앞상부=트리거핀이 체결. IMU구간 회피
+# 나사 다리 = 벽~벽 솔리드 bridge(cavity 가로지름) → 나사가 솔리드 안으로만 지나감(노출X). 좌 외부 카운터싱크(머리 flush)
+# 단면 중앙에 둬 전체폭 채움(앞뒤 다 당김). 정크션 + 하부핸들 2 (IMU구간 z-34..-76 회피). 케이블은 다리 옆(y<28)으로 지나감
+SEAM_BOSS = [(16, -28), (32, -80), (32, -88)]
 for (by, bz) in SEAM_BOSS:
-    body = body.union(cq.Workplane("YZ", origin=(0, by, bz)).circle(3.2).extrude(5, both=True))    # 내부 보스 Ø6.4, x-5..5 (벽에 1.7 물림)
-    body = body.cut(cq.Workplane("YZ", origin=(0, by, bz)).circle(0.85).extrude(5.2))              # 우 파일럿 Ø1.7 (M2 셀프탭)
-    body = body.cut(cq.Workplane("YZ", origin=(0, by, bz)).circle(1.4).extrude(-32))               # 좌 클리어+접근홀 Ø2.8 (옆면 외부까지 → 여기로 나사)
+    bar = cq.Workplane("YZ", origin=(0, by, bz)).rect(8, 8).extrude(44, both=True).intersect(ctrl)  # 벽~벽 솔리드 다리
+    body = body.union(bar)
+    body = body.cut(cq.Workplane("YZ", origin=(0, by, bz)).circle(0.85).extrude(22))     # 우 파일럿 Ø1.7 (M2 셀프탭)
+    body = body.cut(cq.Workplane("YZ", origin=(0, by, bz)).circle(1.5).extrude(-22))      # 좌 클리어 Ø3 (다리 안)
+    body = body.cut(cq.Workplane("YZ", origin=(-15, by, bz)).circle(2.4).extrude(-12))    # 좌 외부 카운터싱크 Ø4.8 (머리 flush)
 
 cq.exporters.export(body, f"{OUT}/grip_body_v3.step")
 cq.exporters.export(body, f"{OUT}/grip_body_v3.stl")   # 조립체(검증/렌더용)
