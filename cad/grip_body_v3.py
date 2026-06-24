@@ -53,10 +53,12 @@ body = body.union(hbar)
 # ── 리프트 SS-5GL: 벽부착 브래킷(+X벽쪽으로 좁힘 → -X에 IMU 자리 비움) → 포켓 + 레버창 + 나사홀 ──
 lbrk = cq.Workplane("XY", origin=(13, LIFT_AT[1], LIFT_AT[2])).box(16, 14, 26).intersect(ctrl)  # x5..21.5(intersect→x5..벽), IMU(x≤1) 회피
 body = body.union(lbrk)                                                                       # 벽 부착 솔리드
-# 스위치 포켓 = 시임(x0)쪽으로 열림 → 우반쪽 열고 스위치를 옆에서 눕혀 넣음. +X벽·Y끝·바닥이 잡고, 좌반쪽이 시임 닫음
+# 스위치 포켓 = 시임(x0)쪽으로 열림 → 우반쪽 열고 스위치를 옆에서 눕혀 넣음. +X 백킹벽에 나사2로 고정, Y끝·바닥 지지, 좌반쪽이 시임 닫음
 body = body.cut(cq.Workplane("XY", origin=(7.5, LIFT_AT[1], LIFT_AT[2])).box(15, SS[2] + 0.6, SS[0] + 0.6))  # 포켓 x0..15 (시임 열림)
 body = body.cut(cq.Workplane("XY", origin=(LIFT_AT[0] + 8, LIFT_AT[1], LIFT_AT[2])).box(18, 4, 6))  # 레버창(측면 +X)
-# 배선은 시임쪽 열린 포켓으로 자연스레 빠짐(별도 슬롯 불필요). 스위치는 압입+좌반쪽 닫힘으로 고정(필요시 글루)
+for dz in (-3.2, 3.2):                                                                        # SS-5GL 고정 나사 파일럿(+X 백킹벽, 실측 피치6.4) — 스위치 시임쪽서 관통해 고정
+    body = body.cut(cq.Workplane("YZ", origin=(15, LIFT_AT[1], LIFT_AT[2] + dz)).circle(1.0).extrude(3))
+# 배선은 시임쪽 열린 포켓으로 빠짐. 스위치: +X벽 나사2 + Y끝/바닥 지지 + 좌반쪽 닫힘
 
 # ── IMU 백킹 플레이트 (-X벽 부착, 손잡이형상 intersect로 벽에 확실히 붙음) + 나사홀2 ──
 ca, sa = np.cos(np.radians(IMU_TILT)), np.sin(np.radians(IMU_TILT))
@@ -95,9 +97,9 @@ SEAM_BOSS = [(31, -28), (19, -85), (47, -85)]
 for (by, bz) in SEAM_BOSS:
     tube = cq.Workplane("YZ", origin=(0, by, bz)).circle(3.5).extrude(40, both=True).intersect(ctrl)  # Ø7 솔리드 튜브(벽~벽, 나사 감쌈)
     body = body.union(tube)
-    body = body.cut(cq.Workplane("YZ", origin=(0, by, bz)).circle(0.85).extrude(22))     # 우 파일럿 Ø1.7 (M2 셀프탭)
-    body = body.cut(cq.Workplane("YZ", origin=(0, by, bz)).circle(1.5).extrude(-22))      # 좌 클리어 Ø3 (튜브 안)
-    body = body.cut(cq.Workplane("YZ", origin=(-6, by, bz)).circle(2.4).extrude(-24))     # 좌 외부 카운터싱크 Ø4.8 (머리, 표면 어디든)
+    body = body.cut(cq.Workplane("YZ", origin=(0, by, bz)).circle(0.85).extrude(8))       # 우 파일럿 Ø1.7 블라인드(x0..8만, 오른쪽 바깥은 막힘)
+    body = body.cut(cq.Workplane("YZ", origin=(0, by, bz)).circle(1.5).extrude(-22))      # 좌 클리어 Ø3 (튜브 안, 옆면 외부까지 = 나사 입구)
+    body = body.cut(cq.Workplane("YZ", origin=(-6, by, bz)).circle(2.4).extrude(-24))     # 좌 외부 카운터싱크 Ø4.8 (머리 묻힘)
 
 cq.exporters.export(body, f"{OUT}/grip_body_v3.step")
 cq.exporters.export(body, f"{OUT}/grip_body_v3.stl")   # 조립체(보스O, 창X) — assemble이 창 자른 뒤 좌우 분리함
