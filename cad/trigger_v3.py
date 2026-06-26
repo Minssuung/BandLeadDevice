@@ -31,6 +31,7 @@ lever = lever.cut(cq.Workplane("YZ", origin=(-7, C[1], C[2])).circle((PT.TRIG_PI
 lever = lever.cut(cq.Workplane("XZ", origin=(MAG[0], -23.5, MAG[2])).circle((PT.MAGNET_DIA + 0.2) / 2).extrude(PT.MAGNET_THK + 0.2))
 lever = lever.edges("|X and <Z").fillet(1.8)
 cq.exporters.export(lever, f"{OUT}/trigger_lever_v3.stl")
+cq.exporters.export(lever, f"{OUT}/trigger_lever_v3.step")   # Fusion 편집용
 print("lever vol:", round(lever.val().Volume()))
 
 # ── 피벗 보스 2 + 핀 + 홀 마운트 (그립측, 별도) ──
@@ -44,6 +45,7 @@ hallblk = (cq.Workplane("XY", origin=(HALL[0], HALL[1] - 1, HALL[2])).box(8, 4, 
            .cut(cq.Workplane("XZ", origin=(HALL[0], HALL[1] + 1, HALL[2])).rect(4.4, 3.2).extrude(-3)))
 mount = mount.union(hallblk)
 cq.exporters.export(mount, f"{OUT}/trigger_mount_v3.stl")
+cq.exporters.export(mount, f"{OUT}/trigger_mount_v3.step")   # Fusion 편집용
 print("mount(보스+홀) vol:", round(mount.val().Volume()))
 
 

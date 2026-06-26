@@ -21,6 +21,7 @@ BZ = -16.0                            # z (top -15.25, bottom -16.75; 스커트-
 board = cq.Workplane("XY", origin=(BC[0], BC[1], BZ - BT / 2)).box(BW, BL, BT, centered=(True, True, False))
 # 케이블 출구 슬롯(뒤쪽) + 배선 그리드 표시는 실제 만능기판이 가짐(여기선 외형만)
 cq.exporters.export(board, f"{OUT}/perfboard_v3.stl")
+cq.exporters.export(board, f"{OUT}/perfboard_v3.step")   # Fusion 편집용
 import pymeshfix
 _m = trimesh.load(f"{OUT}/perfboard_v3.stl")
 if not _m.is_watertight:

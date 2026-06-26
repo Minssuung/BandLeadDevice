@@ -59,6 +59,7 @@ for nm, (bx, by) in BTN.items():
            .union(cq.Workplane("XY", origin=(bx, by, 0.8)).circle(2.9).extrude(ACT_TOP - 0.8)))  # 스템 Ø5.8→택트
     caps = cap if caps is None else caps.union(cap)
 cq.exporters.export(caps, f"{OUT}/button_caps_v3.stl")
+cq.exporters.export(caps, f"{OUT}/button_caps_v3.step")   # Fusion 편집용
 print("button_caps vol:", round(caps.val().Volume()))
 # 만능보드는 이제 그립 하부 트레이에 마운트(허브) — 캐리어엔 보드 레일 없음. 택트 핀/선은 홀더 밑으로 내려가 허브보드에 직배선
 
@@ -86,6 +87,7 @@ for (hx, hy, dx, dy) in hooks:
 carrier = carrier.cut(cq.Workplane("XY", origin=(0, -25, -10)).box(16, 12, 14))
 cq.exporters.export(carrier, f"{OUT}/carrier_v3.step")
 cq.exporters.export(carrier, f"{OUT}/carrier_v3.stl")
+cq.exporters.export(carrier, f"{OUT}/carrier_v3.step")   # Fusion 편집용
 print("carrier vol:", round(carrier.val().Volume()))
 
 # ── 그립 헤드벽에 창4 ──
@@ -98,6 +100,7 @@ for (hx, hy, dx, dy) in hooks:
         win = cq.Workplane("XY", origin=(hx, hy, (WIN_BOT + WIN_TOP) / 2)).box(HKW + 1.5, 8, WIN_TOP - WIN_BOT)
     grip = grip.cut(win)
 cq.exporters.export(grip, f"{OUT}/grip_body_v3.stl")
+cq.exporters.export(grip, f"{OUT}/grip_body_v3.step")   # Fusion 편집용
 _gm = trimesh.load(f"{OUT}/grip_body_v3.stl")   # IMU 리세스 부울이 남긴 vol=0 슬리버 제거(조각/watertight 정리)
 _gm.update_faces(_gm.nondegenerate_faces()); _gm.remove_unreferenced_vertices()
 if not _gm.is_watertight:
@@ -109,7 +112,9 @@ HB = 250
 gright = grip.intersect(cq.Workplane("XY", origin=(HB / 2, 0, 0)).box(HB, HB, HB))   # x>0: 리프트 SS-5GL측
 gleft = grip.intersect(cq.Workplane("XY", origin=(-HB / 2, 0, 0)).box(HB, HB, HB))    # x<0: IMU측
 cq.exporters.export(gright, f"{OUT}/grip_right_v3.stl")
+cq.exporters.export(gright, f"{OUT}/grip_right_v3.step")   # Fusion 편집용
 cq.exporters.export(gleft, f"{OUT}/grip_left_v3.stl")
+cq.exporters.export(gleft, f"{OUT}/grip_left_v3.step")   # Fusion 편집용
 print("그립+창 exported, 좌우 분리(창포함) exported")
 
 # ── 잠김 검증 ──

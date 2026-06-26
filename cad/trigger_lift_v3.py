@@ -26,6 +26,7 @@ lever = lever.cut(cq.Workplane("YZ", origin=(-6, C[1], C[2])).circle((PT.TRIG_PI
 lever = lever.edges("|X and <Z").fillet(1.5)
 lever = lever.rotate((C[0], C[1], C[2]), (C[0] + 1, C[1], C[2]), 18)                   # 손잡이 곡률 따라 18° 틸트
 cq.exporters.export(lever, f"{OUT}/trigger_lift_v3.stl")
+cq.exporters.export(lever, f"{OUT}/trigger_lift_v3.step")   # Fusion 편집용
 print("lift lever vol:", round(lever.val().Volume()))
 
 
