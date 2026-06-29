@@ -30,6 +30,8 @@ lever = lever.cut(cq.Workplane("YZ", origin=(-7, C[1], C[2])).circle((PT.TRIG_PI
 # 자석 포켓 Φ5.2×2.2 — rear(+Y)면에서 -Y로 파냄(자석이 +Y=홀쪽을 향함)
 lever = lever.cut(cq.Workplane("XZ", origin=(MAG[0], -23.5, MAG[2])).circle((PT.MAGNET_DIA + 0.2) / 2).extrude(PT.MAGNET_THK + 0.2))
 lever = lever.edges("|X and <Z").fillet(1.8)
+# 토션스프링 레버다리 관통 홀(Φ1.5, X축) — 다리 끝 끼워 관통→끝 꺾어 고정(복귀력 전달). 자석포켓(z-18)·보어 회피. 그립다리=그립 포스트
+lever = lever.cut(cq.Workplane("YZ", origin=(-5, C[1] - 0.5, C[2] - 5.5)).circle(0.75).extrude(10))  # 피벗 반경5.5, 날 관통(x-5..5)
 cq.exporters.export(lever, f"{OUT}/trigger_lever_v3.stl")
 cq.exporters.export(lever, f"{OUT}/trigger_lever_v3.step")   # Fusion 편집용
 print("lever vol:", round(lever.val().Volume()))
