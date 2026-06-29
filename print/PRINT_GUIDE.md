@@ -85,4 +85,13 @@ V3 파라메트릭 컨트롤러. **기능 검증 완료**(2라운드 독립 fact
 
 ## 6. 미관 마감 (프린트 검증 후)
 
-기능이 실물로 확정되면 **Blender**로 grip_body 외형만 Smooth/Sculpt (내부 정밀 유지) — **Meta Quest 컨트롤러 스타일**(헤드 + 앞으로 기운 에르고 손잡이, 유기적 블렌딩). cadquery 파라메트릭으론 박스-원통 경계 블렌딩이 안 됨(fillet·loft 실패 확인). 메시 스무딩 목표 형상은 `cad/out/controller_smooth.stl` 참고(`smooth_form.py`로 현재형상 재생성).
+기능이 실물로 확정되면 **Blender**로 grip_body 외형만 Smooth/Sculpt (내부 정밀 유지).
+
+**미관 타깃 = 실제 Meta Quest 3 컨트롤러 스캔** (`cad/ref/quest3_full_right.stl` = 완전체, `cad/ref/quest3_cover_right.stl` = 손잡이 겉쉘). 곡선 에르고 손잡이 + 라운드 헤드 + 유기적 블렌딩.
+
+**Blender 워크플로**:
+1. 우리 `grip_body_v3.stl`(또는 좌우 합본)을 Quest 스캔과 정렬(헤드·손잡이축 맞춤)
+2. 겉면을 Quest 스캔 형상에 맞춰 조각(Shrinkwrap/Sculpt) — **내부 마운트·포켓·홀은 유지**
+3. ⚠️ **손잡이 단면은 우리 치수 유지**: IMU(폭30)+보드 때문에 Φ38 필요 → Quest(단면 27×28)보다 두꺼움. **스타일(곡률·라운드)만 맞추고 굵기는 우리 것**
+
+> cadquery 파라메트릭으론 박스-원통 경계 블렌딩이 안 됨(fillet·loft 실패 확인) → 이 단계는 메시 기반(Blender)이 정석.
