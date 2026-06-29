@@ -5,6 +5,7 @@
 """
 import numpy as np
 import trimesh
+import cadquery as cq
 from scipy import ndimage
 import matplotlib; matplotlib.use("Agg"); matplotlib.rcParams["font.family"]="Noto Sans CJK KR"; matplotlib.rcParams["axes.unicode_minus"]=False
 import matplotlib.pyplot as plt
@@ -12,7 +13,15 @@ from mpl_toolkits.mplot3d.art3d import Poly3DCollection
 
 OUT = "/home/minsung/dev_ws/BandLeadDevice/cad/out"
 PITCH = 0.7
-m = trimesh.load(f"{OUT}/controller_v3.stl")
+# 현재 외형 솔리드 (grip_body_v3.py와 동일 파라미터: 손잡이 112, 틸트18 등) — stale STL 대신 직접 빌드
+HEAD = (56, 58, 24); HEAD_R = 11; HANDLE_D = 38; HANDLE_L = 112; TILT = 18; OFF = (0, 10, -10)
+_head = cq.Workplane("XY").box(*HEAD, centered=(True, True, False)).translate((0, 0, -HEAD[2])).edges("|Z").fillet(HEAD_R)
+_handle = (cq.Workplane("XY").circle(HANDLE_D / 2).extrude(-HANDLE_L).edges("<Z").fillet(HANDLE_D / 2 * 0.85)
+           .rotate((0, 0, 0), (1, 0, 0), TILT).translate(OFF))
+_ctrl = _head.union(_handle)
+_vv, _tt = _ctrl.val().tessellate(0.5)
+m = trimesh.Trimesh(np.array([(p.x, p.y, p.z) for p in _vv]), np.array(_tt))
+m.export(f"{OUT}/controller_v3.stl")   # 현재 외형 솔리드 갱신
 vg = m.voxelized(PITCH).fill()
 occ = np.pad(np.asarray(vg.matrix), 8, constant_values=0)
 
