@@ -73,7 +73,7 @@ for zc in (-45.25, -54.75):                                                     
     body = body.cut(_lt(cq.Workplane("YZ", origin=(3.5, 9.5, zc)).circle(0.95).extrude(5)))    # +X 파일럿 Ø1.9
     body = body.cut(_lt(cq.Workplane("YZ", origin=(-3.5, 9.5, zc)).circle(2.3).extrude(-3)))   # -X 머리 카운터보어
 body = body.cut(_lt(cq.Workplane("XY", origin=(0, 12, -60)).box(5, 6, 5)))                     # 와이어/단자 출구
-body = body.cut(_lt(cq.Workplane("YZ", origin=(6, 5, -28)).circle(0.75).extrude(3)))           # 토션스프링 그립 다리 홀(+X보스 x6..9, 코일 +X끝 다리 끼워 고정)
+body = body.cut(_lt(cq.Workplane("YZ", origin=(6, 5, -28)).circle(0.75).extrude(5)))           # 토션스프링 그립 다리 관통홀(+X보스 x6..11 뚫림) — 다리 끼워 반대로 빼고 끝 꺾어 걺
 
 # ── IMU 백킹 플레이트 (-X벽 부착, 손잡이형상 intersect로 벽에 확실히 붙음) + 나사홀2 ──
 ca, sa = np.cos(np.radians(IMU_TILT)), np.sin(np.radians(IMU_TILT))
@@ -100,7 +100,7 @@ wire = (cq.Workplane("XY", origin=(0, 0, -15)).circle(4.0).extrude(30)
         .rotate((0, 0, 0), (1, 0, 0), HANDLE_TILT).translate((0, 43, -111)))
 body = body.cut(wire)
 # 트리거 토션스프링(0.4×ID3.2 일자) — 코일은 핀 x5~7 틈에, 그립 다리는 +X보스에 뚫은 홀에 끼워 고정 (레버다리=레버 관통홀)
-body = body.cut(cq.Workplane("YZ", origin=(7, -23, C[2] + 2.75)).circle(0.75).extrude(3))   # 그립 다리 홀(+X보스 x7..10, y-23=보스 안쪽) — 코일 +X끝 다리 끼움
+body = body.cut(cq.Workplane("YZ", origin=(7, -23, C[2] + 2.75)).circle(0.75).extrude(5))   # 그립 다리 관통홀(+X보스 x7..12 뚫림, y-23=보스안쪽) — 다리 끼워 반대로 빼고 끝 꺾어 걺
 # 트리거 레버 통로 슬롯 (앞벽, +Y로 더 확장해 당김 전구간 클리어 — 풀당김 16°서 경계앞벽 안 걸리게 y-18까지)
 body = body.cut(cq.Workplane("XY", origin=(0, -24.5, -16)).box(13, 13, 28))
 
