@@ -14,13 +14,13 @@ from mpl_toolkits.mplot3d.art3d import Poly3DCollection
 import parts as PT
 
 OUT = "/home/minsung/dev_ws/BandLeadDevice/cad/out"
-C = np.array([0.0, -1.0, -36.0])     # 피벗 (그립 LIFT_PIV와 동일), 축 X
-SS = np.array([0.0, 6.8, -50.0])     # 택트(6×6) 중심 (그립 TACT_AT, 틸트 후). 플런저 -Y(레버쪽)
-PULL = 6.0                           # 당김 각 (택트 트래블 작아 실사용 ~5° 내)
+C = np.array([0.0, 5.0, -32.0])      # 피벗 (그립 LIFT_PIV와 동일, 손잡이 안쪽 깊은곳), 축 X
+SS = np.array([0.0, 8.0, -50.0])     # SS-5GL 중심 (그립 SS_AT, 피벗 아래). 액추에이터 -Y(레버쪽)
+PULL = 6.0                           # 당김 각
 
-# ── 레버 (직접식: nub 없이 패드 뒷면이 택트 직접 누름). 수직으로 만들고 18° 틸트 → 손잡이 앞면 곡률 따라감 ──
+# ── 레버 (피벗 안쪽, 날이 앞으로 나옴). 수직으로 만들고 18° 틸트 → 손잡이 앞면 곡률 따라감. 날 뒷면이 SS-5GL 누름 ──
 hub = cq.Workplane("YZ", origin=(-5, C[1], C[2])).circle(4).extrude(7)                 # 허브 x-5..2 (+X쪽 줄여 토션스프링 코일 자리)
-arm = cq.Workplane("XY", origin=(0, -3, -49)).box(6, 4, 24)                            # 중지 패드 암 (피벗서 수직, y-5..-1, x±3=택트포켓에 맞춤)
+arm = cq.Workplane("XY", origin=(0, 0, -45)).box(6, 4, 28)                             # 중지 패드 날 (피벗서 앞으로, y-2..2, z-59..-31)
 lever = hub.union(arm)
 lever = lever.cut(cq.Workplane("YZ", origin=(-6, C[1], C[2])).circle((PT.TRIG_PIVOT_DIA + 0.4) / 2).extrude(12))  # 피벗 보어 Φ3.4
 lever = lever.edges("|X and <Z").fillet(1.5)

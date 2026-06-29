@@ -21,7 +21,7 @@ WALL = 3.0
 C = (0, -25, -9)                 # 트리거 피벗 (캐리어 안 닿게 -9)
 HALL = (0, -17, -18)             # AH49E (자석 뒤, 보스 연결바에)
 LIFT_AT = (11.5, 17.8, -34); SS = (20.0, 6.5, 10.2)   # +X 내벽(표면17)에 붙되 벽 2mm 남게 x=11.5
-IMU_AT = (-4, 31, -75); IMU_TILT = PT.IMU_TILT_DEG   # -X벽, 트리거 아래 전용구간(손잡이 길어져 확보). 트리거(z-60 끝)와 분리
+IMU_AT = (-4, 32, -78); IMU_TILT = PT.IMU_TILT_DEG   # -X벽, 트리거 아래 전용구간. SS-5GL(z-60 끝) 아래로 분리
 W34, W30, TH = PT.IMU_BOARD; STAND = 4.0
 
 # ── 형상 ──
@@ -50,24 +50,30 @@ hbar = cq.Workplane("XY", origin=(0, -17.5, HALL[2])).box(22, 6, 6)             
 hbar = hbar.cut(cq.Workplane("XZ", origin=(0, -20.5, HALL[2])).rect(4.6, 3.4).extrude(-3))  # AH49E 포켓(-Y면, 앞 -20.5)
 body = body.union(hbar)
 
-# ── 리프트 = 앞면 2단 트리거 (중지) → 작은 택트(6×6) 직접 누름. 손잡이 곡률(18°) 따라 앞면에 배치 (SS-5GL 대체) ──
-# 손잡이가 깊을수록 앞면이 +Y로 휘므로, 피벗 기준 18° 틸트해야 레버가 앞면에 붙고 손가락이 닿음
-LIFT_PIV = (0, -1, -36)                            # 피벗 (앞면 z-36, front y-1.5), X핀. 곡률 18° 틸트 기준
-TACT_AT = (0, 6.8, -50)                            # 택트 중심(레버 뒤·손잡이 안, 틸트 후 실위치) — 참고용
+# ── 리프트 = 앞면 2단 트리거 (중지) → SS-5GL 리미트스위치 누름. 손잡이 곡률(18°) 따라 앞면에 배치 ──
+# 레버: 앞면 패드(곡률), Φ3 핀이 양쪽보스 관통해 회전. 뒷면이 SS-5GL 액추에이터 누름. 토션스프링 복귀
+LIFT_PIV = (0, 5, -32)                             # 피벗: 손잡이 안쪽(넓음→핀 보스 재료 충분)·트리거 위. X핀. 곡률 18° 틸트 기준
+SS_AT = (0, 8, -50)                                # SS-5GL 중심(피벗 아래·뒤). 레버 뒷면이 액추에이터(-Y) 누름
 
 
 def _lt(wp):                                        # LIFT_PIV 기준 손잡이 곡률(18°) 틸트
     return wp.rotate(LIFT_PIV, (LIFT_PIV[0] + 1, LIFT_PIV[1], LIFT_PIV[2]), HANDLE_TILT)
 
 
-for sx in (-8, 8):                                                                            # 피벗 보스 2 (intersect로 앞면 밖 안나감)
-    body = body.union(_lt(cq.Workplane("XY", origin=(sx, -1, -38)).box(4, 10, 16)).intersect(ctrl))
-body = body.cut(_lt(cq.Workplane("YZ", origin=(-11, -1, -36)).circle(PT.TRIG_PIVOT_DIA / 2).extrude(22)))  # 피벗 핀홀 Φ3
-body = body.cut(_lt(cq.Workplane("XY", origin=(0, -1, -47)).box(11, 12, 32)))                 # 레버 통로 슬롯(곡률 따라, 앞면 손가락 접근 + 당김 스윙 클리어)
-body = body.union(_lt(cq.Workplane("XY", origin=(0, 4, -52)).box(12, 8, 11)).intersect(ctrl))  # 택트 홀더(레버 뒤, 손잡이 안)
-body = body.cut(_lt(cq.Workplane("XY", origin=(0, 1.25, -52)).box(6.8, 5, 6.6)))             # 택트 포켓(뒤=택트몸체, 앞=플런저+패드 진입 열림)
-body = body.cut(_lt(cq.Workplane("XY", origin=(0, 7, -58)).box(3.5, 4, 6)))                   # 와이어 출구(아래)
-body = body.union(_lt(cq.Workplane("XY", origin=(7, 1, -34)).box(2, 3, 5)))                   # 토션스프링 그립 다리 포스트
+# 피벗 보스2 (안쪽 넓은 곳이라 핀 보스 재료 충분) + 핀홀(X, 조립시 반쪽 열고 끼움)
+for sx in (-8, 8):
+    body = body.union(_lt(cq.Workplane("XY", origin=(sx, 5, -33)).box(4, 12, 14)).intersect(ctrl))   # y-1..11, z-40..-26
+body = body.cut(_lt(cq.Workplane("YZ", origin=(-12, 5, -32)).circle(PT.TRIG_PIVOT_DIA / 2).extrude(24)))  # 핀홀 Φ3
+# 레버 통로 슬롯 (앞면; 날이 앞으로 나와 중지가 닿음. 곡률 틸트)
+body = body.cut(_lt(cq.Workplane("XY", origin=(0, 0, -47)).box(11, 12, 32)))                  # 날 통로 y-6..6, z-63..-31
+# SS-5GL 마운트 (피벗 아래) — 2나사홀(Ø2.4 피치9.5)을 +X 보스 파일럿에 셀프탭. 액추에이터 -Y(레버쪽)
+body = body.union(_lt(cq.Workplane("XY", origin=(7, 8, -50)).box(8, 13, 24)).intersect(ctrl))  # +X 마운팅 보스
+body = body.cut(_lt(cq.Workplane("XY", origin=(0, 8, -50)).box(7, 11, 20.6)))                 # SS-5GL 포켓 (x±3.5, y2.5..13.5, z-40..-60)
+for zc in (-45.25, -54.75):                                                                    # 나사 2개 (피치9.5)
+    body = body.cut(_lt(cq.Workplane("YZ", origin=(3.5, 9.5, zc)).circle(0.95).extrude(5)))    # +X 파일럿 Ø1.9
+    body = body.cut(_lt(cq.Workplane("YZ", origin=(-3.5, 9.5, zc)).circle(2.3).extrude(-3)))   # -X 머리 카운터보어
+body = body.cut(_lt(cq.Workplane("XY", origin=(0, 12, -60)).box(5, 6, 5)))                     # 와이어/단자 출구
+body = body.union(_lt(cq.Workplane("XY", origin=(7, 5, -28)).box(2, 3, 6)))                    # 토션스프링 그립 다리 포스트(피벗 근처)
 
 # ── IMU 백킹 플레이트 (-X벽 부착, 손잡이형상 intersect로 벽에 확실히 붙음) + 나사홀2 ──
 ca, sa = np.cos(np.radians(IMU_TILT)), np.sin(np.radians(IMU_TILT))
