@@ -24,6 +24,8 @@ arm = cq.Workplane("XY", origin=(0, 0, -45)).box(6, 4, 28)                      
 lever = hub.union(arm)
 lever = lever.cut(cq.Workplane("YZ", origin=(-6, C[1], C[2])).circle((PT.TRIG_PIVOT_DIA + 0.4) / 2).extrude(12))  # 피벗 보어 Φ3.4(x-6..6, 핀 관통)
 lever = lever.edges("|X and <Z").fillet(1.5)
+# 토션스프링 레버다리 슬롯: 허브 +X면 앞·아래(피벗서 반경~3.4, 코일쪽 x>4 개방). 스프링 다리 끝을 여기 끼워 복귀력이 레버로 전달됨 (그립다리=그립 포스트)
+lever = lever.cut(cq.Workplane("XY", origin=(3, C[1] - 1.5, C[2] - 3.2)).box(4, 1.8, 2.4))  # x1..5, y앞쪽, z핀아래(보어 안건드림)
 lever = lever.rotate((C[0], C[1], C[2]), (C[0] + 1, C[1], C[2]), 18)                   # 손잡이 곡률 따라 18° 틸트
 cq.exporters.export(lever, f"{OUT}/trigger_lift_v3.stl")
 cq.exporters.export(lever, f"{OUT}/trigger_lift_v3.step")   # Fusion 편집용
