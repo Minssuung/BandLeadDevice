@@ -21,17 +21,17 @@ PULL = 6.0                           # 당김 각
 # ── 레버 (피벗 안쪽, 날 앞으로). 허브 가운데 갭에 토션스프링 코일을 가둠(케이지). 18° 틸트 ──
 COIL_LEN = 4.8                        # 토션스프링 코일 축방향 두께(실측)
 GAP = COIL_LEN + 0.4                  # 케이지 갭 5.2 (코일+여유)
-FL = 3.1                             # 양 플랜지 두께
-HW = GAP / 2 + FL                     # 허브 반폭 5.7 → 허브 x-5.7..5.7
-hub = cq.Workplane("YZ", origin=(-HW, C[1], C[2])).circle(4).extrude(2 * HW)           # Ø8 허브, x-5.7..5.7
+FL = 4.4                             # 양 플랜지 두께 (넓혀 보스까지 0.5mm 남기고 공간 채움 — 축방향 유격 제거)
+HW = GAP / 2 + FL                     # 허브 반폭 7.0 → 허브 x-7.0..7.0 (보스 안쪽 x7.5까지 0.5)
+hub = cq.Workplane("YZ", origin=(-HW, C[1], C[2])).circle(4).extrude(2 * HW)           # Ø8 허브, x-7..7
 arm = cq.Workplane("XY", origin=(0, 0, -45)).box(6, 4, 28)                             # 중지 패드 날 x±3 (앞 브리지가 양 플랜지 연결), y-2..2, z-59..-31
 lever = hub.union(arm)
 # 코일 케이지 갭: 허브 가운데(x±2.6) 뒤쪽 개방 포켓 — 코일이 핀 감고 두 플랜지 사이에 갇힘. 앞 브리지(y<2.5)+날이 양쪽 연결
 lever = lever.cut(cq.Workplane("XY", origin=(0, C[1] + 2, C[2])).box(GAP, 9, 6))       # x±2.6, y2.5..11.5, z-35..-29 (코일 자리, 뒤로 개방)
-lever = lever.cut(cq.Workplane("YZ", origin=(-6, C[1], C[2])).circle((PT.TRIG_PIVOT_DIA + 0.4) / 2).extrude(12))  # 피벗 보어 Φ3.4(x-6..6, 핀 관통)
+lever = lever.cut(cq.Workplane("YZ", origin=(-7.5, C[1], C[2])).circle((PT.TRIG_PIVOT_DIA + 0.4) / 2).extrude(15))  # 피벗 보어 Φ3.4(x-7.5..7.5, 넓은 허브 관통)
 lever = lever.edges("|X and <Z").fillet(1.5)
-# 토션스프링 레버다리 슬롯: 갭 +X쪽 날-윗면에 코일 다리(아래로) 키 — 슬롯 벽이 토크 받음(코일은 케이지가 축방향 잡음)
-lever = lever.cut(cq.Workplane("XY", origin=(2, C[1] - 3.5, C[2] - 4.5)).box(1.8, 4, 2.2))  # x1.1..2.9, y앞아래, z핀아래(레버다리 끼움)
+# 토션스프링 레버다리 슬롯: 갭 가운데(중앙정렬) 날-윗면에 코일 다리(아래로) 키 — 슬롯 벽이 토크 받음(코일은 케이지가 축방향 잡음)
+lever = lever.cut(cq.Workplane("XY", origin=(0, C[1] - 3.5, C[2] - 4.5)).box(1.8, 4, 2.2))  # x±0.9 중앙, y앞아래, z핀아래(레버다리 끼움)
 lever = lever.rotate((C[0], C[1], C[2]), (C[0] + 1, C[1], C[2]), 18)                   # 손잡이 곡률 따라 18° 틸트
 cq.exporters.export(lever, f"{OUT}/trigger_lift_v3.stl")
 cq.exporters.export(lever, f"{OUT}/trigger_lift_v3.step")   # Fusion 편집용
