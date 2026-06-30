@@ -45,6 +45,8 @@ except Exception as e:
 for sx in (-9, 9):
     body = body.union(cq.Workplane("XY", origin=(sx, C[1], -12)).box(4, 7, 16))   # z-20..-4, 앞벽 부착
 body = body.cut(cq.Workplane("YZ", origin=(-12, C[1], C[2])).circle(PT.TRIG_PIVOT_DIA / 2).extrude(24))  # 핀홀 Φ3 (X축)
+body = body.cut(cq.Workplane("YZ", origin=(-6.8, C[1], C[2])).circle(5.5).extrude(13.6))  # 검지 허브(Ø10,x±6.5) 회전 소켓 Ø11 x±6.8 (핀은 바깥 보스 x7~11 지지)
+body = body.cut(cq.Workplane("XY", origin=(0, -19, C[2])).box(2, 3, 4))                    # 검지 토션스프링 그립다리 슬롯 (소켓 뒷벽, 그립에 키)
 # 홀 마운트 바: 두 보스를 잇고(연결) AH49E 포켓 -Y면. 자석 overshoot/충돌 안 하게 뒤로(앞면 -20.5)
 hbar = cq.Workplane("XY", origin=(0, -17.5, HALL[2])).box(22, 6, 6)               # Y-20.5..-14.5, x±11
 hbar = hbar.cut(cq.Workplane("XZ", origin=(0, -20.5, HALL[2])).rect(4.6, 3.4).extrude(-3))  # AH49E 포켓(-Y면, 앞 -20.5)
@@ -76,7 +78,7 @@ for zc in (-45.25, -54.75):                                                     
     body = body.cut(_lt(cq.Workplane("YZ", origin=(3.5, 9.5, zc)).circle(0.95).extrude(5)))    # +X 파일럿 Ø1.9
     body = body.cut(_lt(cq.Workplane("YZ", origin=(-3.5, 9.5, zc)).circle(2.3).extrude(-3)))   # -X 머리 카운터보어
 body = body.cut(_lt(cq.Workplane("XY", origin=(0, 12, -60)).box(5, 6, 5)))                     # 와이어/단자 출구
-body = body.cut(_lt(cq.Workplane("YZ", origin=(6, 5, -28)).circle(0.75).extrude(5)))           # 토션스프링 그립 다리 관통홀(+X보스 x6..11 뚫림) — 다리 끼워 반대로 빼고 끝 꺾어 걺
+# (리프트 그립다리 = 케이지 소켓 뒷벽 슬롯, line71. 구 +X관통홀 제거)
 
 # ── IMU 백킹 플레이트 (-X벽 부착, 손잡이형상 intersect로 벽에 확실히 붙음) + 나사홀2 ──
 ca, sa = np.cos(np.radians(IMU_TILT)), np.sin(np.radians(IMU_TILT))
@@ -102,8 +104,7 @@ for (ox, oy, w, d) in [(-23, 4.5, 6, 35), (23, 4.5, 6, 35), (0, 23, 48, 6)]:
 wire = (cq.Workplane("XY", origin=(0, 0, -15)).circle(4.0).extrude(30)
         .rotate((0, 0, 0), (1, 0, 0), HANDLE_TILT).translate((0, 43, -111)))
 body = body.cut(wire)
-# 트리거 토션스프링(0.4×ID3.2 일자) — 코일은 핀 x5~7 틈에, 그립 다리는 +X보스에 뚫은 홀에 끼워 고정 (레버다리=레버 관통홀)
-body = body.cut(cq.Workplane("YZ", origin=(7, -23, C[2] + 2.75)).circle(0.75).extrude(5))   # 그립 다리 관통홀(+X보스 x7..12 뚫림, y-23=보스안쪽) — 다리 끼워 반대로 빼고 끝 꺾어 걺
+# (검지 토션스프링: 코일=레버 케이지, 그립다리=소켓 뒷벽 슬롯 line49. 구 +X관통홀 제거)
 # 트리거 레버 통로 슬롯 (앞벽, +Y로 더 확장해 당김 전구간 클리어 — 풀당김 16°서 경계앞벽 안 걸리게 y-18까지)
 body = body.cut(cq.Workplane("XY", origin=(0, -24.5, -16)).box(13, 13, 28))
 
