@@ -18,14 +18,18 @@ C = np.array([0.0, 5.0, -32.0])      # 피벗 (그립 LIFT_PIV와 동일, 손잡
 SS = np.array([0.0, 8.0, -50.0])     # SS-5GL 중심 (그립 SS_AT, 피벗 아래). 액추에이터 -Y(레버쪽)
 PULL = 6.0                           # 당김 각
 
-# ── 레버 (피벗 안쪽, 날이 앞으로 나옴). 수직으로 만들고 18° 틸트 → 손잡이 앞면 곡률 따라감. 날 뒷면이 SS-5GL 누름 ──
-hub = cq.Workplane("YZ", origin=(-4, C[1], C[2])).circle(4).extrude(8)                 # 허브 x-4..4 (중앙정렬, 날과 동심). 코일 갭은 그립 +X보스(x7) 사이 3mm
-arm = cq.Workplane("XY", origin=(0, 0, -45)).box(6, 4, 28)                             # 중지 패드 날 (피벗서 앞으로, x±3 중앙, y-2..2, z-59..-31)
+# ── 레버 (피벗 안쪽, 날 앞으로). 허브 가운데 갭에 토션스프링 코일을 가둠(케이지). 18° 틸트 ──
+COIL_LEN = 4.8                        # 토션스프링 코일 축방향 두께(실측)
+GAP = COIL_LEN + 0.4                  # 케이지 갭 5.2 (코일+여유)
+FL = 3.1                             # 양 플랜지 두께
+HW = GAP / 2 + FL                     # 허브 반폭 5.7 → 허브 x-5.7..5.7
+hub = cq.Workplane("YZ", origin=(-HW, C[1], C[2])).circle(4).extrude(2 * HW)           # Ø8 허브, x-5.7..5.7
+arm = cq.Workplane("XY", origin=(0, 0, -45)).box(6, 4, 28)                             # 중지 패드 날 x±3 (앞 브리지가 양 플랜지 연결), y-2..2, z-59..-31
 lever = hub.union(arm)
+# 코일 케이지 갭: 허브 가운데(x±2.6) 뒤쪽 개방 포켓 — 코일이 핀 감고 두 플랜지 사이에 갇힘. 앞 브리지(y<2.5)+날이 양쪽 연결
+lever = lever.cut(cq.Workplane("XY", origin=(0, C[1] + 2, C[2])).box(GAP, 9, 6))       # x±2.6, y2.5..11.5, z-35..-29 (코일 자리, 뒤로 개방)
 lever = lever.cut(cq.Workplane("YZ", origin=(-6, C[1], C[2])).circle((PT.TRIG_PIVOT_DIA + 0.4) / 2).extrude(12))  # 피벗 보어 Φ3.4(x-6..6, 핀 관통)
 lever = lever.edges("|X and <Z").fillet(1.5)
-# 토션스프링 레버다리 = 관통 홀(Φ1.5, X축)에 다리 끝을 끼워 관통→끝 살짝 꺾어 고정(안 빠짐, 복귀력 전달). 그립다리=그립 포스트
-lever = lever.cut(cq.Workplane("YZ", origin=(-4, C[1] - 5, C[2] - 4)).circle(0.75).extrude(8))  # 핀 아래 반경6.4, 날 관통(x-4..4)
 lever = lever.rotate((C[0], C[1], C[2]), (C[0] + 1, C[1], C[2]), 18)                   # 손잡이 곡률 따라 18° 틸트
 cq.exporters.export(lever, f"{OUT}/trigger_lift_v3.stl")
 cq.exporters.export(lever, f"{OUT}/trigger_lift_v3.step")   # Fusion 편집용

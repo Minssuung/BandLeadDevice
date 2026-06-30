@@ -61,11 +61,12 @@ def _lt(wp):                                        # LIFT_PIV 기준 손잡이 
 
 
 # 피벗 보스2 (안쪽 넓은 곳이라 핀 보스 재료 충분) + 핀홀(X, 조립시 반쪽 열고 끼움)
-for sx in (-8, 8):
-    body = body.union(_lt(cq.Workplane("XY", origin=(sx, 5, -33)).box(4, 12, 14)).intersect(ctrl))   # y-1..11, z-40..-26
-body = body.cut(_lt(cq.Workplane("YZ", origin=(-12, 5, -32)).circle(PT.TRIG_PIVOT_DIA / 2).extrude(24)))  # 핀홀 Φ3
-# 레버 통로 슬롯 (앞면; 날이 앞으로 나와 중지가 닿음. 곡률 틸트)
-body = body.cut(_lt(cq.Workplane("XY", origin=(0, 0, -47)).box(11, 12, 32)))                  # 날 통로 y-6..6, z-63..-31
+for sx in (-9, 9):   # 케이지 허브(x±5.7)·날(x±5) 넓어져 보스 x±8→±9로 이동(간섭 회피)
+    body = body.union(_lt(cq.Workplane("XY", origin=(sx, 5, -33)).box(4, 12, 14)).intersect(ctrl))   # x7..11/-11..-7, y-1..11, z-40..-26
+body = body.cut(_lt(cq.Workplane("YZ", origin=(-13, 5, -32)).circle(PT.TRIG_PIVOT_DIA / 2).extrude(26)))  # 핀홀 Φ3 (x-13..13, 양보스 관통)
+body = body.cut(_lt(cq.Workplane("YZ", origin=(-6.5, 5, -32)).circle(4.5).extrude(13)))  # 허브(Ø8) 회전 소켓 Ø9 클리어런스 x±6.5 (핀은 바깥 보스 x7~11이 지지)
+# 레버 통로 슬롯 (앞면; 날 x±5 나와 중지가 닿음. 곡률 틸트)
+body = body.cut(_lt(cq.Workplane("XY", origin=(0, 0, -47)).box(13, 12, 32)))                  # 날 통로 x±6.5, y-6..6, z-63..-31
 # SS-5GL 마운트 (피벗 아래) — 2나사홀(Ø2.4 피치9.5)을 +X 보스 파일럿에 셀프탭. 액추에이터 -Y(레버쪽)
 body = body.union(_lt(cq.Workplane("XY", origin=(7, 8, -50)).box(8, 13, 24)).intersect(ctrl))  # +X 마운팅 보스
 body = body.cut(_lt(cq.Workplane("XY", origin=(0, 8, -50)).box(7, 11, 20.6)))                 # SS-5GL 포켓 (x±3.5, y2.5..13.5, z-40..-60)
