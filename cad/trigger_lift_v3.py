@@ -30,6 +30,8 @@ lever = hub.union(arm)
 lever = lever.cut(cq.Workplane("XY", origin=(0, C[1] + 2, C[2])).box(GAP, 9, 6))       # x±2.6, y2.5..11.5, z-35..-29 (코일 자리, 뒤로 개방)
 lever = lever.cut(cq.Workplane("YZ", origin=(-6, C[1], C[2])).circle((PT.TRIG_PIVOT_DIA + 0.4) / 2).extrude(12))  # 피벗 보어 Φ3.4(x-6..6, 핀 관통)
 lever = lever.edges("|X and <Z").fillet(1.5)
+# 토션스프링 레버다리 슬롯: 갭 +X쪽 날-윗면에 코일 다리(아래로) 키 — 슬롯 벽이 토크 받음(코일은 케이지가 축방향 잡음)
+lever = lever.cut(cq.Workplane("XY", origin=(2, C[1] - 3.5, C[2] - 4.5)).box(1.8, 4, 2.2))  # x1.1..2.9, y앞아래, z핀아래(레버다리 끼움)
 lever = lever.rotate((C[0], C[1], C[2]), (C[0] + 1, C[1], C[2]), 18)                   # 손잡이 곡률 따라 18° 틸트
 cq.exporters.export(lever, f"{OUT}/trigger_lift_v3.stl")
 cq.exporters.export(lever, f"{OUT}/trigger_lift_v3.step")   # Fusion 편집용
