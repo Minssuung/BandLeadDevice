@@ -108,7 +108,7 @@ body = body.cut(cq.Workplane("XY", origin=(0, -24.5, -16)).box(13, 13, 28))
 # (y,z): 정크션뒤 + 핸들하부 앞·뒤. 헤드=캐리어가, 앞상부=트리거핀이 체결. IMU구간 회피
 # 나사 다리 = 벽~벽 솔리드 bridge(cavity 가로지름) → 나사가 솔리드 안으로만 지나감(노출X). 좌 외부 카운터싱크(머리 flush)
 # 벽쪽(앞·뒤) 위치 — 가운데는 케이블 길로 비움. 나사를 Ø7 솔리드 튜브로 감싸 cavity 노출 없음. 정크션뒤+하부 앞·뒤
-SEAM_BOSS = [(31, -28), (24, -103), (58, -103)]   # 하부2는 길어진 손잡이 바닥 근처로 내림(IMU z-75 아래)
+SEAM_BOSS = [(31, -28), (24, -103), (52, -103)]   # 하부2(앞24·뒤52): 손잡이축(z-103서 y40)서 ±, 뒤보스 58→52로(58은 뒤모서리 넘어 보스 잘렸음)
 for (by, bz) in SEAM_BOSS:
     tube = cq.Workplane("YZ", origin=(0, by, bz)).circle(3.5).extrude(40, both=True).intersect(ctrl)  # Ø7 솔리드 튜브(벽~벽, 나사 감쌈)
     body = body.union(tube)
